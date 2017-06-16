@@ -12,11 +12,9 @@
     <script src="../js/exjs/boUi.js"></script>
   </head>
   <body>
+    <form id="ttt" method="get"></form>
     <div id="t"></div>
   
-
-
-
     <div class="panel panel-primary" style="width: 100%">
   <!-- Default panel contents -->
   <div class="panel-heading">Panel heading</div>
@@ -25,40 +23,71 @@
   </div>
 
   <!-- Table -->
-  <table class="table">
-    <tr>
-    	<td></td>
-		<td></td>
-		<td></td>
-		<td></td>
-    </tr>
-    <tr>
-    	<td></td>
-		<td></td>
-		<td></td>
-		<td></td>
-    </tr>
-
-  </table>
+ <table id="dgTable_" class="table table-bordered table-hover">
+ <tr id="titleTr_" class="success">
+ 	<th width="50px">
+ 		<div style="width:50px;overflow:hidden;text-align:center" title="名称">名称</div>
+ 	</th>
+ 	<th width="80px">
+ 	<div style="width:80px;overflow:hidden;text-align:center" title="机构名称">机构名称</div>
+ 	</th>
+ 	<th width="80px">
+ 	<div style="width:80px;overflow:hidden;text-align:center" title="筛查时间">筛查时间</div>
+ 	</th>
+ 	<th width="80px">
+ 	<div style="width:80px;overflow:hidden;text-align:center" title="人群类别">人群类别</div>
+ 	</th>
+ 	<th width="80px">
+ 	<div style="width:80px;overflow:hidden;text-align:center" title="应筛查梅毒数">应筛查梅毒数</div>
+ 	</th>
+ 	</tr>
+ 	<tr>
+ 	<td>123</td>
+ 	<td>男</td>
+ 	<td>19</td>
+ 	<td>123456789</td>
+ 	<td>2000-01-01</td>
+ 	</tr>
+ 	<tr>
+ 	<td>123</td>
+ 	<td>男</td>
+ 	<td>19</td>
+ 	<td>123456789</td>
+ 	<td>2000-01-01</td>
+ 	</tr>
+ 	<tr>
+ 	<td>123</td>
+ 	<td>男</td>
+ 	<td>19</td>
+ 	<td>123456789</td>
+ 	<td>2000-01-01</td>
+ 	</tr>
+ 	</table>
 </div>
 
   </body>
   <script type="text/javascript">
   $(function(){
   	$('#t').boDataGrid({
+  		// basePath:,
+  		url:'../jsonData/test.json',
+  		expActionUrl:'file:///E:/git/boUi/jsonData/test.json',
   		width:'50px',
   		title:'hahaha',
-  		url:'../jsonData/test.json',
   		queryParams:{},
-  		formId:'',
+  		formId:'ttt',
+  		isExpExl:true,
   		columns: [[
                 {field: 'NAME', title: '名称', width: '50px'},
                 {field: 'SEX', title: '机构名称', width: '80px'},
                 {field: 'AGE', title: '筛查时间', width: '80px'},
                 {field: 'TEL', title: '人群类别', width: '80px',formatter:function(val,row){
-                  return '11111'
+                  return '222'
                 }},
-                {field: 'BRI', title: '应筛查梅毒数', width: '80px'}
+                {field: 'BRI', title: '应筛查梅毒数', width: '100px'},
+                {field: 'OP', title: '操作', width: '100px',formatter:function(val,row){
+                	return '<input type="button" value="123123"></input>'
+                }}
             ]],
   		toolbar:[
   		{
