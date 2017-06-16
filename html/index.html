@@ -13,7 +13,7 @@
   </head>
   <body>
     <form id="ttt" method="get"></form>
-    <div id="t"></div>
+    <div id="t" style="padding: 10px"></div>
   
     <div class="panel panel-primary" style="width: 100%">
   <!-- Default panel contents -->
@@ -29,16 +29,16 @@
  		<div style="width:50px;overflow:hidden;text-align:center" title="名称">名称</div>
  	</th>
  	<th width="80px">
- 	<div style="width:80px;overflow:hidden;text-align:center" title="机构名称">机构名称</div>
+ 	<div style="width:80px;overflow:hidden;text-align:center" title="机构名称">机构</div>
  	</th>
  	<th width="80px">
- 	<div style="width:80px;overflow:hidden;text-align:center" title="筛查时间">筛查时间</div>
+ 	<div style="width:80px;overflow:hidden;text-align:center" title="筛查时间">时间</div>
  	</th>
  	<th width="80px">
- 	<div style="width:80px;overflow:hidden;text-align:center" title="人群类别">人群类别</div>
+ 	<div style="width:80px;overflow:hidden;text-align:center" title="人群类别">类别</div>
  	</th>
  	<th width="80px">
- 	<div style="width:80px;overflow:hidden;text-align:center" title="应筛查梅毒数">应筛查梅毒数</div>
+ 	<div style="width:80px;overflow:hidden;text-align:center" title="应筛查梅毒数">test</div>
  	</th>
  	</tr>
  	<tr>
@@ -79,12 +79,12 @@
   		isExpExl:true,
   		columns: [[
                 {field: 'NAME', title: '名称', width: '50px'},
-                {field: 'SEX', title: '机构名称', width: '80px'},
-                {field: 'AGE', title: '筛查时间', width: '80px'},
-                {field: 'TEL', title: '人群类别', width: '80px',formatter:function(val,row){
+                {field: 'SEX', title: '机构', width: '80px'},
+                {field: 'AGE', title: '时间', width: '80px'},
+                {field: 'TEL', title: '类别', width: '80px',formatter:function(val,row){
                   return '222'
                 }},
-                {field: 'BRI', title: '应筛查梅毒数', width: '100px'},
+                {field: 'BRI', title: 'test', width: '100px'},
                 {field: 'OP', title: '操作', width: '100px',formatter:function(val,row){
                 	return '<input type="button" value="123123"></input>'
                 }}

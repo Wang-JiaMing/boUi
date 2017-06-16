@@ -36,6 +36,14 @@
 
   	$.fn.boDataGrid.methods = {
         init:function (options) {
+    	 	$(_this).append('<div id="boDataGridModal" class="modal fade bs-example-modal-sm" '+
+			   				   'tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">'+
+							   '<div class="modal-dialog modal-sm" role="document">'+
+							   '<div class="modal-content">'+
+							   '<span class="glyphicon glyphicon-arrow-down" aria-hidden="true"></span>正在下载文件，请稍等'+
+							   '</div></div></div>');
+    	 	$('#boDataGridModal').modal({backdrop: 'static', keyboard: false}); 
+            $('#boDataGridModal').modal('show');
            $(_this).append('<div id="loading" class="loading">Loading pages...</div>  ');
            var _this=this
            $(_this).attr('style','width:100%;height:100%;overflow:auto');
@@ -74,20 +82,12 @@
 				if(options.isExpExl){
                    $exp=$('<button type="button" class="btn btn-success"><span class="glyphicon glyphicon-save" aria-hidden="true"></span>导出</button>');
 				   $toolbarButton.append($exp);
-				   $(_this).append('<div id="expModal" class="modal fade bs-example-modal-sm" '+
-				   				   'tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">'+
-								   '<div class="modal-dialog modal-sm" role="document">'+
-								   '<div class="modal-content">'+
-								   '<span class="glyphicon glyphicon-arrow-down" aria-hidden="true"></span>正在下载文件，请稍等'+
-								   '</div></div></div>');
 				   $exp.click(function(){
-				   	   $('#expModal').modal({backdrop: 'static', keyboard: false}); 
-                       $('#expModal').modal('show');
                        if($("#" + options.formId).attr('method')||$("#" + options.formId).attr('method')==''||$("#" + options.formId).attr('method').toUpperCase()=='GET'){
 								$("#" + options.formId).attr('method','post');
                        }
                        $("#" + options.formId).attr("action",options.expActionUrl).submit();
-                       $('#expModal').modal('hide');
+                       // $('#expModal').modal('hide');
 				   });
 				}
 				$toolbar.append($toolbarButton);
@@ -134,7 +134,7 @@
 	                  	}
 		                $table.append($tr);
 	                }
-
+				//$('#expModal').modal('show');
 	       }, "json");
 		$(_this).append($table);
         }
