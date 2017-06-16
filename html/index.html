@@ -48,6 +48,18 @@
   	$('#t').boDataGrid({
   		width:'50px',
   		title:'hahaha',
+  		url:'../jsonData/test.json',
+  		queryParams:{},
+  		formId:'',
+  		columns: [[
+                {field: 'NAME', title: '名称', width: '50px'},
+                {field: 'SEX', title: '机构名称', width: '80px'},
+                {field: 'AGE', title: '筛查时间', width: '80px'},
+                {field: 'TEL', title: '人群类别', width: '80px',formatter:function(val,row){
+                  return '11111'
+                }},
+                {field: 'BRI', title: '应筛查梅毒数', width: '80px'}
+            ]],
   		toolbar:[
   		{
   			text:'1111',
