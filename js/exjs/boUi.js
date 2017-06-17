@@ -1,5 +1,18 @@
 /**author:wangjiaming**/
 (function($){
+    
+    var defaultSysParams={width:'100%',height:'100%'};
+
+    $.fn.boButton=function(options){
+      var _this = this ;
+      /*button*/
+      if($(_this).html().toLowerCase().indexOf('button')>0){
+
+      }else{
+
+      }                
+    };
+
     /**
     bootstrap datagrid
     options={
