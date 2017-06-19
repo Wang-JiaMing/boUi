@@ -158,7 +158,8 @@
       	 	}
           	var $table=$('<table id="dgTable_" class="table table-bordered table-hover"><tbody></tbody></table>'),$tableTitle;
           	if(_options.tableTitle&&_options.tableTitle!=''){
-				$tableTitle=$(_options.tableTitle);
+			   	$tableTitle=$(_options.tableTitle);
+                $tableTitle.addClass("success");
           	}else{
             	$tr=$('<tr id="titleTr_" class="success"></tr>');
           		for(var i=0;i<_options.columns[0].length;i++){
@@ -169,12 +170,14 @@
                		var $th=$('<th width="'+thWidth+'" title="'+_options.columns[0][i].title+'"><div style="width:'+thWidth+';overflow:hidden">'+_options.columns[0][i].title+'</div></th>') 
           	    	$tr.append($th);
           		}
+          		$tableTitle=$tr;
           	}
-          	$tableTitle=$tr;
           	$table.append($tableTitle);
     		$dataDiv=$('<tbody id=tableData></tbody>');
           	$table.append($dataDiv);
-          	$buttonFooter=$('<div class="panel-footer"></div>');
+          	 $buttonFooter=$('<div class="panel-footer">'+
+            '<div style="float:right" class="bg-danger" id="pageContent"></div>' +
+			'</div>');
 			$(_this).append($table);
 			var pagesListHtml='<div id="fyList" class="btn-group dropup" role="group">'+
 							'<button id="_nowPageBtn" class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown" '+
@@ -231,7 +234,7 @@
         	var _options =_this.boDataGrid('getParams');
         	var $tableData = $('#tableData');
         	$('#tableData tr').remove();
-          	var params='rows='+_options.rows+'&page='+_options.pages;
+          	var params='rows='+_options.rows+'&page='+_options.page;
           	if(_options.formId&&_options.formId!=''&&$('#'+_options.formId).serialize().length>'0'){
           		params=params+'&'+$('#'+_options.formId).serialize();
  				// params=$.param(_options.queryParams)+'&'+$('#'+_options.formId).serialize();
@@ -242,6 +245,7 @@
         	$.post(_options.url,params,
 	        	function(data){
 	        		defaultDataGridParams.total = data.total;
+                    $('#pageContent').html('当前显示第'+_options.page+'页/每页显示'+_options.rows+'条数据/共'+defaultDataGridParams.total+'条数据');
 	                for(var i=0;i<data.rows.length;i++){
 	                  	$tr=$('<tr></tr>');
 	                  	var thWidth='100px';
