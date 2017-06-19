@@ -3,15 +3,79 @@
     
     var defaultSysParams={width:'100%',height:'100%'};
 
+    /**
+      options={
+          
+          size:,//'lg','sm','xs'
+      }
+    **/
+
     $.fn.boButton=function(options){
-      var _this = this ;
-      /*button*/
-      if($(_this).html().toLowerCase().indexOf('button')>0){
-
-      }else{
-
-      }                
+      var defaultParams={scene:'default',type:'button',text:'ok',size:''}
+      options = $.extend({}, defaultParams, options);
+      if ($.fn.boButton.methods[options]) {
+          return $.fn.boButton.methods[ options ].apply( this, Array.prototype.slice.call( arguments, 1 ));
+      }else if ( typeof options === 'object' || ! options ) {
+          return $.fn.boButton.methods.init.apply( this, arguments );
+      } else {
+          $.error( 'Method ' +  method + ' does not exist on jQuery.tooltip' );
+      }        
     };
+
+    $.fn.boButton.methods = {
+        init:function (options) {
+          var _this = this ;
+          /*button*/
+          $(_this).addClass('btn btn-'+options.scene);
+          if(options.size&&options.size!=''){
+            var sizeClass;
+            if(options.size=='lg'){
+              sizeClass='btn-lg';
+            }else if(options.size=='sm'){
+              sizeClass='btn-sm';
+            }else{
+              sizeClass='btn-xs';
+            }
+            $(_this).addClass(sizeClass);
+          }
+          if($(_this)[0].outerHTML.toLowerCase().indexOf('<button')>-1){
+              $(_this).append(options.text).attr('type',options.type);
+          /*<a>*/
+          }else if($(_this)[0].outerHTML.toLowerCase().indexOf('<a')>-1){
+              $(_this).append(options.text);
+          /*<input>*/
+          }else if($(_this)[0].outerHTML.toLowerCase().indexOf('<input')>-1){
+              $(_this).attr('value',options.text).attr('type',options.type);
+          }else{
+            console.error("please use <button>,<a> or <input>!");
+          }  
+        },
+        disabled:function(){
+          alert(111)
+          var _this = this ;
+          if($(_this)[0].outerHTML.toLowerCase().indexOf('<button')>-1){
+              $(_this).attr('disabled','disabled');
+          /*<a>*/
+          }else if($(_this)[0].outerHTML.toLowerCase().indexOf('<a')>-1){
+              $(_this).addClass('disabled');
+          /*<input>*/
+          }else if($(_this)[0].outerHTML.toLowerCase().indexOf('<input')>-1){
+              $$(_this).attr('disabled','disabled');
+          } 
+        },
+        enable:function(){
+          var _this = this ;
+          if($(_this)[0].outerHTML.toLowerCase().indexOf('<button')>-1){
+              $(_this).removeAttr('disabled','disabled');
+          /*<a>*/
+          }else if($(_this)[0].outerHTML.toLowerCase().indexOf('<a')>-1){
+              $(_this).removeClass('disabled');
+          /*<input>*/
+          }else if($(_this)[0].outerHTML.toLowerCase().indexOf('<input')>-1){
+              $$(_this).removeAttr('disabled','disabled');
+          }
+        }
+    }
 
     /**
     bootstrap datagrid

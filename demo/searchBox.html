@@ -12,13 +12,16 @@
     <script src="../js/exjs/boUi.js"></script>
   </head>
   <body>
-    <button id="b">
+    <button id="b"></button>
   
   </body>
   <script type="text/javascript">
   $(function(){
       $('#b').boButton({
+        size:'lg'
       });
+
+      $('#b').boButton('disabled');
   });	
   </script>
 </html>
