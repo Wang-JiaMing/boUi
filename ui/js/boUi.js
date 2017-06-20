@@ -102,7 +102,7 @@
             $('#boDataGridLoading-'+_options.namespace).modal({backdrop: 'static', keyboard: false});
             if(_options.title){$(_this).append('<div class="panel-heading">'+_options.title+'</div>');}
             if(_options.toolbar!=undefined&&_options.toolbar.length>0){
-                var $toolbar=$('<div class="panel-body"></div>');
+                var $toolbar=$('<div class="panel-body" style="padding:3px"></div>');
                 var $toolbarButton=$('<div class="btn-group" role="group" aria-label=""></div>');
                 $(_options.toolbar).each(function (i, o) {
                     var _btnScene='default';
