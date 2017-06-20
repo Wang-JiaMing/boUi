@@ -6,11 +6,8 @@
           size:,//'lg','sm','xs'
       }
      **/
-    // var defaultDataGridParams='';
 
     $.fn.boButton=function(options){
-        var defaultParams={scene:'default',type:'button',text:'ok',size:''}
-        options = $.extend({}, defaultParams, options);
         if ($.fn.boButton.methods[options]) {
             return $.fn.boButton.methods[ options ].apply( this, Array.prototype.slice.call( arguments, 1 ));
         }else if ( typeof options === 'object' || ! options ) {
@@ -75,29 +72,7 @@
         }
     }
 
-    /**
-     bootstrap datagrid
-     options={
-       url:,
-       queryParams:
-       formId:,
-       tableTitle:,//自定义tableTitled的在此处填写html片段
-       width:,//宽
-       height:,//高
-       scene:,//情景样式 primary（默认）、success、info、warning、danger
-       title:,//标题
-       toolbar:[
-        {text:,
-           type:,//list
-             btnScene:,//按钮情景样式 default、primary、success、info、warning、danger、link
-         handler:function(){
-
-         }
-        }
-       ]
-    }
-     **/
-    var defaultDataGridParams='';
+    var defaultDataGridParams='',namespace,tmpBoDataGridData={data:''};
     $.fn.boDataGrid=function(options){
         if ($.fn.boDataGrid.methods[options]) {
             return $.fn.boDataGrid.methods[ options ].apply( this, Array.prototype.slice.call( arguments, 1 ));
@@ -119,14 +94,15 @@
         },
         init:function (options) {
             var _this = this ;
+            namespace=_this[0].id;
             var _options=_this.boDataGrid('getParams',options);
             $(_this).attr('style','width:100%;height:100%;overflow:auto');
             $(_this).attr('class','panel panel-primary');
-            $(_this).append('<div id="boDataGridLoading" class="modal fade bs-example-modal-sm" tabindex="-1"'+
+            $(_this).append('<div id="boDataGridLoading-'+namespace+'" class="modal fade bs-example-modal-sm" tabindex="-1"'+
                 'role="dialog" aria-labelledby="mySmallModalLabel">'+
                 '<div class="modal-dialog modal-sm" role="document"><div class="modal-content">'+
                 '<div style="text-align: center"><img src="../ui/img/boLoading.gif" style="width:30px">正在加载，请稍等...<div></div></div></div>');
-            $('#boDataGridLoading').modal({backdrop: 'static', keyboard: false});
+            $('#boDataGridLoading-'+namespace).modal({backdrop: 'static', keyboard: false});
             if(_options.title){$(_this).append('<div class="panel-heading">'+_options.title+'</div>');}
             if(_options.toolbar!=undefined&&_options.toolbar.length>0){
                 var $toolbar=$('<div class="panel-body"></div>');
@@ -161,12 +137,12 @@
                 $toolbar.append($toolbarButton);
                 $(_this).append($toolbar);
             }
-            var $table=$('<table id="dgTable_" class="table table-bordered table-hover"><tbody></tbody></table>'),$tableTitle;
+            var $table=$('<table id="dgTable-'+namespace+'" class="table table-bordered table-hover"><tbody></tbody></table>'),$tableTitle;
             if(_options.tableTitle&&_options.tableTitle!=''){
                 $tableTitle=$(_options.tableTitle);
                 $tableTitle.addClass("success");
             }else{
-                $tr=$('<tr id="titleTr_" class="success"></tr>');
+                $tr=$('<tr id="titleTr-'+namespace+'" class="success"></tr>');
                 for(var i=0;i<_options.columns[0].length;i++){
                     var thWidth='100px';
                     if(_options.columns[0][i].width&&_options.columns[0][i].width!=''){
@@ -178,13 +154,13 @@
                 $tableTitle=$tr;
             }
             $table.append($tableTitle);
-            $dataDiv=$('<tbody id=tableData></tbody>');
+            $dataDiv=$('<tbody id="tableData-'+namespace+'"></tbody>');
             $table.append($dataDiv);
             $buttonFooter=$('<div class="panel-footer">'+
-                '<div style="float:right" class="bg-danger" id="pageContent"></div>' +
-                '</div>');
+                            '<div style="float:right" class="bg-danger" id="pageContent"></div>' +
+                            '</div>');
             $(_this).append($table);
-            var pagesListHtml='<div id="fyList" class="btn-group dropup" role="group">'+
+            var pagesListHtml='<div id="fyList-'+namespace+'" class="btn-group dropup" role="group">'+
                 '<button id="_nowPageBtn" class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown" '+
                 'aria-haspopup="true" aria-expanded="false">';
 
@@ -231,15 +207,21 @@
                     defaultDataGridParams.page=matchPage;
                 }
                 $('#nowPage').html(defaultDataGridParams.page);
-                _this.boDataGrid('queryData');
+                if(typeof _options.onBeforeLoad== "function"){
+                    if(_options.onBeforeLoad()!=false){
+                        _this.boDataGrid('queryData');
+                    }
+                }else{
+                    _this.boDataGrid('queryData');
+                }
             });
         },
         queryData:function(){
             var _this = this;
-            $('#boDataGridLoading').modal('show');
+            $('#boDataGridLoading-'+namespace).modal('show');
             var _options =_this.boDataGrid('getParams');
-            var $tableData = $('#tableData');
-            $('#tableData tr').remove();
+            var $tableData = $('#tableData-'+namespace);
+            $('#tableData-'+namespace+' tr').remove();
             var params='rows='+_options.rows+'&page='+_options.page;
             if(_options.formId&&_options.formId!=''&&$('#'+_options.formId).serialize().length>'0'){
                 params=params+'&'+$('#'+_options.formId).serialize();
@@ -248,8 +230,10 @@
             if(_options.queryParams){
                 params=params+'&'+$.param(_options.queryParams);
             }
+           
             $.post(_options.url,params,
                 function(data){
+                    tmpBoDataGridData.data=data;
                     defaultDataGridParams.total = data.total;
                     $('#pageContent').html('当前显示第'+_options.page+'页/每页显示'+_options.rows+'条数据/共'+defaultDataGridParams.total+'条数据');
                     for(var i=0;i<data.rows.length;i++){
@@ -269,14 +253,36 @@
                         $dataDiv.append($tr);
                     }
                     $tableData.append($dataDiv);
-                    $('#boDataGridLoading').modal('hide');
-                }, "json");
+                    $('#boDataGridLoading-'+namespace).modal('hide');
+                    if(typeof _options.onLoadSuccess== "function"){
+                        _options.onLoadSuccess(data);
+                    }
+                    
+                    $('#tableData-'+namespace+' tr').click(function(){
+                        var _index=$(this).attr('index').slice(6);
+                        var _row=tmpBoDataGridData.data.rows[_index];
+                        if(typeof _options.onClickRow == "function"){
+                            _options.onClickRow(_index,_row);
+                        }
+                    });
+
+                    $('#tableData-'+namespace+' tr').dblclick(function(){
+                        var _index=$(this).attr('index').slice(6);
+                        var _row=tmpBoDataGridData.data.rows[_index];
+                        if(typeof _options.onDblClickRow == "function"){
+                            _options.onDblClickRow(_index,_row);
+                        }
+                    });
+            }, "json");     
         },
         loading:function(){
-          $('#boDataGridLoading').modal('show'); 
+          $('#boDataGridLoading-'+namespace).modal('show'); 
         },
         loaded:function(){
-          $('#boDataGridLoading').modal('hide');
+          $('#boDataGridLoading-'+namespace).modal('hide');
+        },
+        getRows:function(){
+          return tmpBoDataGridData.data.rows;
         }
 
     }
