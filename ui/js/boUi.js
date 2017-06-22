@@ -281,7 +281,7 @@
                             $tr.append($th).append($td);
                             $table.append($tr);
                             jsq=jsq+2;
-                            if(jsq>=8){
+                            if(jsq>=options.table[i].colnum){
                                 jsq=0;
                                 $tr='';
                             }
@@ -291,7 +291,7 @@
                         $tr.append('<th></th><td></td>');
                         $table.append($tr);
                         jsq=jsq+2;
-                        if(jsq>=8){
+                        if(jsq>=options.table[i].colnum){
                             jsq=0;
                             $tr='';
                         }
