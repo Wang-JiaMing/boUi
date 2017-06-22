@@ -24,6 +24,17 @@
   	$('#t').boTable({
       formId:'test1',
       method:'post',//post或get
+      toolbar:[
+      {
+        text:'保存',
+        btnScene:'primary',
+        handler:function(){
+                alert('保存');
+      }},{
+        text:'取消',
+        handler:function(){
+                 alert('取消');
+      }}],
       table:[
               {
                 title:"测试1",
@@ -31,7 +42,25 @@
                 scene:'primary',//primary,success,info,warning,danger
                 content:[
                   {title:"id",id:"id",name:"id",hidden:true,disabled:true,readonly:true},//name可以不填，默认取ID为name
-                  {title:"姓名1",id:"name1",placeholder:"姓名",required:true},//默认type="text"
+                  {title:"姓名11111111111111111",id:"name1",placeholder:"姓名",required:true},//默认type="text"
+                  {title:"姓名2",id:"name2",placeholder:"姓名"},
+                  {title:"姓名3",id:"name3",placeholder:"姓名"},
+                  {title:"姓名4",id:"name4",placeholder:"姓名"},
+                  {title:"姓名5",id:"name6",placeholder:"姓名"},
+                  {title:"姓名6",id:"name6",placeholder:"姓名"},
+                  {title:"姓名7",id:"name7",placeholder:"姓名"},
+                  {title:"姓名8",id:"name8",placeholder:"姓名"},
+                  {assType:'radio',name:'testRadio',title:'测试单选',data:[ {id:"1",title:'单选1',value:'1',checked:true},
+                                                                            {id:"2",title:'单选2',value:'2'}]}
+                  ]
+              },
+              {
+                title:"测试2",
+                colnum:'8',//每行多少列
+                scene:'primary',//primary,success,info,warning,danger
+                content:[
+                  {title:"id",id:"id",name:"id",hidden:true,disabled:true,readonly:true},//name可以不填，默认取ID为name
+                  {title:"姓名11111111111111111",id:"name1",placeholder:"姓名",required:true},//默认type="text"
                   {title:"姓名2",id:"name2",placeholder:"姓名"},
                   {title:"姓名3",id:"name3",placeholder:"姓名"},
                   {title:"姓名4",id:"name4",placeholder:"姓名"},

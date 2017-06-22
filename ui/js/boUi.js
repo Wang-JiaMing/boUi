@@ -72,6 +72,136 @@
         }
     }
     
+
+    /**
+     * 基于Bootstrap下拉通用插件
+     * @author wjm
+     * @date 2017-04-27
+     * 用法:
+     * $('#xxx').getBootstrapSelect({
+     *  url:,//后台json请求地址,可用通用字典action [${ctx}/pages/quyjsonpages.action?qid=DIC_GENERAL&typeid=__]
+     *  hasnull:false,//是否增加一个空选择
+     *  name:,//select name
+     *  cache:true,
+     *  selectValueName:value,//默认GCODE
+     *  selectKeyName:key,//默认GNAME
+     *  onLoadSuccess:function(data){//加载成功后触发的方法
+     *
+     *  },
+     *  onSelected:function(data){//加载成功后触发的方法
+     *
+     *  }
+     * });
+     */
+
+    $.fn.boSelecte=function(option){
+        if ($.fn.boSelecte.methods[option]) {
+            return $.fn.boSelecte.methods[ option ].apply( this, Array.prototype.slice.call( arguments, 1 ));
+        }else if ( typeof option === 'object' || ! option ) {
+            return $.fn.boSelecte.methods.init.apply( this, arguments );
+        } else {
+            $.error( 'Method ' +  method + ' does not exist on jQuery.tooltip' );
+        }
+    };
+
+    $.fn.boSelecte.methods = {
+        init: function (option) {
+            var v_selector = this.selector;
+            var v_cache=true;
+            if(option.cache!=undefined&&option.cache!=''){v_cache=option.cache};
+            var v_url = option.url, v_value = "", v_key = "", hasnull = false;
+            if (option.selectValueName != undefined && option.selectValueName != '') {
+                v_value = option.selectValueName;
+            } else {
+                v_value = 'GCODE';
+            }
+            if (option.selectKeyName != undefined && option.selectKeyName != '') {
+                v_key = option.selectKeyName;
+            } else {
+                v_key = 'GNAME';
+            }
+            if (option.hasnull != undefined || option.selectKeyName != '') {
+                hasnull = option.hasnull;
+            }
+            if(v_cache){
+                if($(v_selector).attr('rownum')==undefined||$(v_selector).attr('rownum')=='0'){
+                    $(v_selector).attr("class", "form-control");
+                    if (option.name != undefined && option.name != '') {
+                        $(v_selector).attr("name", option.name);
+                    } else {
+                        $(v_selector).attr("name", v_selector.substr(1));
+                    }
+                    $.ajax({
+                        type: "POST",
+                        url: v_url,
+                        dataType: "json",
+                        success: function (data) {
+                            $(v_selector).attr("rownum", data.rows.length);
+                            var oid = 0;
+                            if (hasnull) {
+                                $(v_selector).append('<option value="" selected="">---请选择---</option>');
+                                oid++;
+                            }
+                            for (var i = 0; i < data.rows.length; i++) {
+                                $(v_selector).append('<option  value="' + data.rows[i][v_value] + '">' + data.rows[i][v_key] + '</option>');
+                                oid++;
+                            }
+                            if (typeof option.onLoadSuccess == "function") {
+                                option.onLoadSuccess(data);
+                            }
+
+                            $(v_selector).change(function () {
+                                if (typeof option.onSelected == "function") {
+                                    option.onSelected();
+                                }
+                            });
+                        }
+                    });
+                }
+            }else{
+                $(v_selector).empty();
+                $(v_selector).attr("class", "form-control");
+                if (option.name != undefined && option.name != '') {
+                    $(v_selector).attr("name", option.name);
+                } else {
+                    $(v_selector).attr("name", v_selector.substr(1));
+                }
+                $.ajax({
+                    type: "POST",
+                    url: v_url,
+                    dataType: "json",
+                    success: function (data) {
+                        $(v_selector).attr("rownum", data.rows.length);
+                        var oid = 0;
+                        if (hasnull) {
+                            $(v_selector).append('<option value="" selected="">---请选择---</option>');
+                            oid++;
+                        }
+                        for (var i = 0; i < data.rows.length; i++) {
+                            $(v_selector).append('<option  value="' + data.rows[i][v_value] + '">' + data.rows[i][v_key] + '</option>');
+                            oid++;
+                        }
+                        if (typeof option.onLoadSuccess == "function") {
+                            option.onLoadSuccess(data);
+                        }
+
+                        $(v_selector).change(function () {
+                            if (typeof option.onSelected == "function") {
+                                option.onSelected();
+                            }
+                        });
+                    }
+                });
+            }
+        },
+        setValue: function (value) {
+            var v_id=$(this).attr("id");
+            $("#"+$(v_id).selector + ' option[selected]').removeAttr("selected");
+            $("#"+$(v_id).selector + ' option[value="'+ value +'"]') .prop("selected", 'selected');
+        }
+    }
+
+
     /**
       form表单
     **/
@@ -88,6 +218,8 @@
     $.fn.boTable.methods={
         init:function(options){
             var _this=this;
+            var $topFormDiv=$('<div style="width:100%;height:100%;overflow:auto"></div>');
+            var $buttonDiv=$('<div style="overflow:auto"><div class="btn-group" role="group" aria-label="anz"></div></div>');
             var $form=$('<form id='+options.formId+' method='+options.method+'></form>');
             for(var i=0;i<options.table.length;i++){
                 var _scene='';
@@ -96,9 +228,8 @@
                 }else{
                     _scene='primary';
                 }
-                var $tableTitel=$('<div id="tableTitle-'+i+'" class="panel panel-'+_scene+'">'+
-                                  '<div class="panel-heading">'+options.table[i].title+'</div><div>');
-                var $table=$('<table id="table-'+i+'" class="table"></table>');
+                var $tableTitel=$('<div id="tableTitle-'+i+'" class="panel panel-'+_scene+'" style="margin-bottom:5px"><div class="panel-heading">'+options.table[i].title+'</div><div>');
+                var $table=$('<table id="table-'+i+'" class="table"><tbody></tbody></table>');
                 var hiddenNum=0;
                 for(var j=0;j<options.table[i].content.length;j++){//处理hidden
                     if(options.table[i].content[j].hidden==true){
@@ -120,14 +251,31 @@
                         if(options.table[i].content[j].hidden==undefined||options.table[i].content[j].hidden==false){
                             var $th=$('<th>'+options.table[i].content[j].title+'</th>');
                             var $td=$('<td></td>');
-                            if(options.table[i].content[j].assType){//其他控件
-
-                            }else{//input
+                            var _assType='text';
+                            if(options.table[i].content[j].assType){//控件类型
+                                _assType=options.table[i].content[j].assType
+                            }
+                            if(_assType=='radio'){//单选控件
+                                var radioHtml='';
+                                $(options.table[i].content[j].data).each(function(){
+                                    var _radioThis=this,_checkedHtml='';
+                                    if(_radioThis.checked){
+                                        _checkedHtml='checked="checked"';
+                                    }
+                                    radioHtml+=_radioThis.title+'<input type="radio" '+_checkedHtml+' name="'+options.table[i].content[j].name+'" id="'+options.table[i].content[j].id+'" value="'+options.table[i].content[j].value+'">';
+                                });
+                                console.info(radioHtml);
+                                $td.append(radioHtml);
+                            }else if(_assType=='text'){
                                 var _name=options.table[i].content[j].id;
                                 if(options.table[i].content[j].name){
-                                        _name=options.table[i].content[j].name;
+                                    _name=options.table[i].content[j].name;
                                 }
-                                var $ass=$('<input type="text" id="'+options.table[i].content[j].id+'" name="'+_name+'" class="form-control">');
+                                var _placeholderHtml='';
+                                if(options.table[i].content[j].placeholder){
+                                    _placeholderHtml='placeholder="'+options.table[i].content[j].placeholder+'"';
+                                }
+                                var $ass=$('<input type="text" id="'+options.table[i].content[j].id+'" name="'+_name+'" '+_placeholderHtml+' class="form-control">');
                                 $td.append($ass);
                             }
                             $tr.append($th).append($td);
@@ -149,10 +297,22 @@
                         }
                     }
                 }
+                $tableTitel.append($table);
+                $form.append($tableTitel);
             }
-            $form.append($table);
-            $tableTitel.append($form);
-            _this.append($tableTitel);
+            $topFormDiv.append($form);
+            _this.append($topFormDiv);
+            $(options.toolbar).each(function (i, o) {
+                var _btnThis=this;
+                var $btn=$('<button type="button" class="btn btn-'+_btnThis.btnScene+'">'+_btnThis.text+'</button>');
+                if(_btnThis.handler&&typeof _btnThis.handler == "function"){
+                    $btn.click(function(){
+                        _btnThis.handler();
+                    });
+                }
+                $buttonDiv.append($btn);
+            });
+            _this.append($buttonDiv);
         }
     }
 
