@@ -71,7 +71,94 @@
             }
         }
     }
+    
+    /**
+      form表单
+    **/
+    $.fn.boTable=function(options){
+        if ($.fn.boTable.methods[options]) {
+            return $.fn.boTable.methods[ options ].apply( this, Array.prototype.slice.call( arguments, 1 ));
+        }else if ( typeof options === 'object' || ! options ) {
+            return $.fn.boTable.methods.init.apply( this, arguments );
+        } else {
+            $.error( 'Method ' +  method + ' does not exist on jQuery.tooltip' );
+        }
+    }
 
+    $.fn.boTable.methods={
+        init:function(options){
+            var _this=this;
+            var $form=$('<form id='+options.formId+' method='+options.method+'></form>');
+            for(var i=0;i<options.table.length;i++){
+                var _scene='';
+                if(options.table[i].scene){
+                    _scene=options.table[i].scene;
+                }else{
+                    _scene='primary';
+                }
+                var $tableTitel=$('<div id="tableTitle-'+i+'" class="panel panel-'+_scene+'">'+
+                                  '<div class="panel-heading">'+options.table[i].title+'</div><div>');
+                var $table=$('<table id="table-'+i+'" class="table"></table>');
+                var hiddenNum=0;
+                for(var j=0;j<options.table[i].content.length;j++){//处理hidden
+                    if(options.table[i].content[j].hidden==true){
+                        hiddenNum++;
+                        var _name=options.table[i].content[j].id;
+                           if(options.table[i].content[j].name){
+                                _name=options.table[i].content[j].name;
+                        }
+                        $table.append('<input type="hidden" id="'+options.table[i].content[j].id+'" name="'+_name+'"/>');
+                    }
+                }
+                var loopNum=Math.ceil((options.table[i].content.length)*2/options.table[i].colnum)*options.table[i].colnum/2;
+                var $tr='',jsq=0;
+                for(var j=0;j<=loopNum;j++){
+                    if($tr==''){
+                        $tr=$('<tr></tr>');
+                    }
+                    if(j<=options.table[i].content.length-1){
+                        if(options.table[i].content[j].hidden==undefined||options.table[i].content[j].hidden==false){
+                            var $th=$('<th>'+options.table[i].content[j].title+'</th>');
+                            var $td=$('<td></td>');
+                            if(options.table[i].content[j].assType){//其他控件
+
+                            }else{//input
+                                var _name=options.table[i].content[j].id;
+                                if(options.table[i].content[j].name){
+                                        _name=options.table[i].content[j].name;
+                                }
+                                var $ass=$('<input type="text" id="'+options.table[i].content[j].id+'" name="'+_name+'" class="form-control">');
+                                $td.append($ass);
+                            }
+                            $tr.append($th).append($td);
+                            $table.append($tr);
+                            jsq=jsq+2;
+                            if(jsq>=8){
+                                jsq=0;
+                                $tr='';
+                            }
+                        }
+                       
+                    }else{//补TH TD
+                        $tr.append('<th></th><td></td>');
+                        $table.append($tr);
+                        jsq=jsq+2;
+                        if(jsq>=8){
+                            jsq=0;
+                            $tr='';
+                        }
+                    }
+                }
+            }
+            $form.append($table);
+            $tableTitel.append($form);
+            _this.append($tableTitel);
+        }
+    }
+
+    /**
+       数据表单
+    **/
     var defaultDataGridParams={},tmpBoDataGridData={};
     $.fn.boDataGrid=function(options){
         if ($.fn.boDataGrid.methods[options]) {
