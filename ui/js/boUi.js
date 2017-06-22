@@ -46,7 +46,6 @@
             }
         },
         disabled:function(){
-            alert(111)
             var _this = this ;
             if($(_this)[0].outerHTML.toLowerCase().indexOf('<button')>-1){
                 $(_this).attr('disabled','disabled');
@@ -71,7 +70,7 @@
             }
         }
     }
-    
+
 
     /**
      * 基于Bootstrap下拉通用插件
@@ -94,19 +93,19 @@
      * });
      */
 
-    $.fn.boSelecte=function(option){
-        if ($.fn.boSelecte.methods[option]) {
-            return $.fn.boSelecte.methods[ option ].apply( this, Array.prototype.slice.call( arguments, 1 ));
+    $.fn.boSelect=function(option){
+        if ($.fn.boSelect.methods[option]) {
+            return $.fn.boSelect.methods[ option ].apply( this, Array.prototype.slice.call( arguments, 1 ));
         }else if ( typeof option === 'object' || ! option ) {
-            return $.fn.boSelecte.methods.init.apply( this, arguments );
+            return $.fn.boSelect.methods.init.apply( this, arguments );
         } else {
             $.error( 'Method ' +  method + ' does not exist on jQuery.tooltip' );
         }
     };
 
-    $.fn.boSelecte.methods = {
+    $.fn.boSelect.methods = {
         init: function (option) {
-            var v_selector = this.selector;
+            var v_selector = this;
             var v_cache=true;
             if(option.cache!=undefined&&option.cache!=''){v_cache=option.cache};
             var v_url = option.url, v_value = "", v_key = "", hasnull = false;
@@ -129,7 +128,7 @@
                     if (option.name != undefined && option.name != '') {
                         $(v_selector).attr("name", option.name);
                     } else {
-                        $(v_selector).attr("name", v_selector.substr(1));
+                        $(v_selector).attr("name", v_selector.selector.substr(1));
                     }
                     $.ajax({
                         type: "POST",
@@ -203,8 +202,8 @@
 
 
     /**
-      form表单
-    **/
+     form表单
+     **/
     $.fn.boTable=function(options){
         if ($.fn.boTable.methods[options]) {
             return $.fn.boTable.methods[ options ].apply( this, Array.prototype.slice.call( arguments, 1 ));
@@ -235,8 +234,8 @@
                     if(options.table[i].content[j].hidden==true){
                         hiddenNum++;
                         var _name=options.table[i].content[j].id;
-                           if(options.table[i].content[j].name){
-                                _name=options.table[i].content[j].name;
+                        if(options.table[i].content[j].name){
+                            _name=options.table[i].content[j].name;
                         }
                         $table.append('<input type="hidden" id="'+options.table[i].content[j].id+'" name="'+_name+'"/>');
                     }
@@ -277,6 +276,10 @@
                                 }
                                 var $ass=$('<input type="text" id="'+options.table[i].content[j].id+'" name="'+_name+'" '+_placeholderHtml+' class="form-control">');
                                 $td.append($ass);
+                            }else if(_assType=='select'){
+                                var $select=$('<select id="'+options.table[i].content[j].id+'"></select>');
+                                $select.boSelect(options.table[i].content[j].data);
+                                $td.append($select);
                             }
                             $tr.append($th).append($td);
                             $table.append($tr);
@@ -286,7 +289,7 @@
                                 $tr='';
                             }
                         }
-                       
+
                     }else{//补TH TD
                         $tr.append('<th></th><td></td>');
                         $table.append($tr);
@@ -313,13 +316,16 @@
                 $buttonDiv.append($btn);
             });
             _this.append($buttonDiv);
+            if(typeof options.onLoadSuccess== "function"){
+                options.onLoadSuccess();
+            }
         }
     }
 
     /**
-       数据表单
-    **/
-    var defaultDataGridParams={},tmpBoDataGridData={};
+     数据表单
+     **/
+    var defaultDataGridParams={},tmpBoDataGridData={},resourse={loadingImg:'../ui/img/boLoading.gif'};
     $.fn.boDataGrid=function(options){
         if ($.fn.boDataGrid.methods[options]) {
             return $.fn.boDataGrid.methods[ options ].apply( this, Array.prototype.slice.call( arguments, 1 ));
@@ -345,7 +351,7 @@
             $(_this).append('<div id="boDataGridLoading-'+_options.namespace+'" class="modal fade bs-example-modal-sm" tabindex="-1"'+
                 'role="dialog" aria-labelledby="mySmallModalLabel">'+
                 '<div class="modal-dialog modal-sm" role="document"><div class="modal-content">'+
-                '<div style="text-align: center"><img src="../ui/img/boLoading.gif" style="width:30px">正在加载，请稍等...<div></div></div></div>');
+                '<div style="text-align: center"><img src="'+loadingImg+'" style="width:30px">正在加载，请稍等...<div></div></div></div>');
             $('#boDataGridLoading-'+_options.namespace).modal({backdrop: 'static', keyboard: false});
             if(_options.title){$(_this).append('<div class="panel-heading">'+_options.title+'</div>');}
             if(_options.toolbar!=undefined&&_options.toolbar.length>0){
@@ -393,11 +399,11 @@
                     var $checkBox=$('<input id="allCheckBox-'+_options.namespace+'" type="checkbox"/>');
                     $thCheck.append($checkBox);
                     $tr.append($thCheck);
-                    $checkBox.change(function() { 
-                       $('#allCheckBox-'+_options.namespace)[0].checked
-                       $('#tableData-'+_options.namespace+' input[type="checkbox"]').each(function(){
-                             console.info(this)
-                       });
+                    $checkBox.change(function() {
+                        $('#allCheckBox-'+_options.namespace)[0].checked
+                        $('#tableData-'+_options.namespace+' input[type="checkbox"]').each(function(){
+                            console.info(this)
+                        });
 
                     });
                 }
@@ -421,8 +427,8 @@
             $tableDiv.append($table);
             $(_this).append($tableDiv);
             $buttonFooter=$('<div class="panel-footer">'+
-                            '<div style="float:right" class="bg-danger" id="pageContent-'+_options.namespace+'"></div>' +
-                            '</div>');
+                '<div style="float:right" class="bg-danger" id="pageContent-'+_options.namespace+'"></div>' +
+                '</div>');
             var pagesListHtml='<div id="fyList-'+_options.namespace+'" class="btn-group dropup" role="group">'+
                 '<button id="_nowPageBtn" class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown" '+
                 'aria-haspopup="true" aria-expanded="false">';
@@ -500,8 +506,8 @@
                     for(var i=0;i<data.rows.length;i++){
                         $tr=$('<tr index="index-'+i+'"></tr>');
                         if(_options.checkbox){
-                           var $dataCheckBox=$('<td><input id="dataCheckBox-'+_options.namespace+'-'+i+'" type="checkbox"/></td>');
-                           $tr.append($dataCheckBox);
+                            var $dataCheckBox=$('<td><input id="dataCheckBox-'+_options.namespace+'-'+i+'" type="checkbox"/></td>');
+                            $tr.append($dataCheckBox);
                         }
                         var thWidth='100px';
                         for(var j=0;j<_options.columns[0].length;j++){
@@ -530,7 +536,7 @@
                     if(typeof _options.onLoadSuccess== "function"){
                         _options.onLoadSuccess(data);
                     }
-                    
+
                     $('#tableData-'+_options.namespace+' tr').click(function(){
                         var _index=$(this).attr('index').slice(6);
                         var _row=tmpBoDataGridData[_this[0].id].rows[_index];
@@ -548,16 +554,16 @@
                             _options.onDblClickRow(_index,_row);
                         }
                     });
-            }, "json");     
+                }, "json");
         },
         loading:function(){
-          $('#boDataGridLoading-'+_options.namespace).modal('show'); 
+            $('#boDataGridLoading-'+_options.namespace).modal('show');
         },
         loaded:function(){
-          $('#boDataGridLoading-'+_options.namespace).modal('hide');
+            $('#boDataGridLoading-'+_options.namespace).modal('hide');
         },
         getRows:function(){
-          return tmpBoDataGridData.data.rows;
+            return tmpBoDataGridData.data.rows;
         }
 
     }
