@@ -250,36 +250,39 @@
                         if(options.table[i].content[j].hidden==undefined||options.table[i].content[j].hidden==false){
                             var $th=$('<th>'+options.table[i].content[j].title+'</th>');
                             var $td=$('<td></td>');
-                            var _assType='text';
-                            if(options.table[i].content[j].assType){//控件类型
-                                _assType=options.table[i].content[j].assType
-                            }
-                            if(_assType=='radio'){//单选控件
-                                var radioHtml='';
-                                $(options.table[i].content[j].data).each(function(){
-                                    var _radioThis=this,_checkedHtml='';
-                                    if(_radioThis.checked){
-                                        _checkedHtml='checked="checked"';
+                            if(options.table[i].content[j].formatter==undefined){
+                                var _assType='text';
+                                if(options.table[i].content[j].assType){//控件类型
+                                    _assType=options.table[i].content[j].assType
+                                }
+                                if(_assType=='radio'){//单选控件
+                                    var radioHtml='';
+                                    $(options.table[i].content[j].data).each(function(){
+                                        var _radioThis=this,_checkedHtml='';
+                                        if(_radioThis.checked){
+                                            _checkedHtml='checked="checked"';
+                                        }
+                                        radioHtml+=_radioThis.title+'<input type="radio" '+_checkedHtml+' name="'+options.table[i].content[j].name+'" id="'+options.table[i].content[j].id+'" value="'+options.table[i].content[j].value+'">';
+                                    });
+                                    $td.append(radioHtml);
+                                }else if(_assType=='text'){
+                                    var _name=options.table[i].content[j].id;
+                                    if(options.table[i].content[j].name){
+                                        _name=options.table[i].content[j].name;
                                     }
-                                    radioHtml+=_radioThis.title+'<input type="radio" '+_checkedHtml+' name="'+options.table[i].content[j].name+'" id="'+options.table[i].content[j].id+'" value="'+options.table[i].content[j].value+'">';
-                                });
-                                console.info(radioHtml);
-                                $td.append(radioHtml);
-                            }else if(_assType=='text'){
-                                var _name=options.table[i].content[j].id;
-                                if(options.table[i].content[j].name){
-                                    _name=options.table[i].content[j].name;
+                                    var _placeholderHtml='';
+                                    if(options.table[i].content[j].placeholder){
+                                        _placeholderHtml='placeholder="'+options.table[i].content[j].placeholder+'"';
+                                    }
+                                    var $ass=$('<input type="text" id="'+options.table[i].content[j].id+'" name="'+_name+'" '+_placeholderHtml+' class="form-control">');
+                                    $td.append($ass);
+                                }else if(_assType=='select'){
+                                    var $select=$('<select id="'+options.table[i].content[j].id+'"></select>');
+                                    $select.boSelect(options.table[i].content[j].data);
+                                    $td.append($select);
                                 }
-                                var _placeholderHtml='';
-                                if(options.table[i].content[j].placeholder){
-                                    _placeholderHtml='placeholder="'+options.table[i].content[j].placeholder+'"';
-                                }
-                                var $ass=$('<input type="text" id="'+options.table[i].content[j].id+'" name="'+_name+'" '+_placeholderHtml+' class="form-control">');
-                                $td.append($ass);
-                            }else if(_assType=='select'){
-                                var $select=$('<select id="'+options.table[i].content[j].id+'"></select>');
-                                $select.boSelect(options.table[i].content[j].data);
-                                $td.append($select);
+                            }else{
+                                $td.append(options.table[i].content[j].formatter());
                             }
                             $tr.append($th).append($td);
                             $table.append($tr);
@@ -351,7 +354,7 @@
             $(_this).append('<div id="boDataGridLoading-'+_options.namespace+'" class="modal fade bs-example-modal-sm" tabindex="-1"'+
                 'role="dialog" aria-labelledby="mySmallModalLabel">'+
                 '<div class="modal-dialog modal-sm" role="document"><div class="modal-content">'+
-                '<div style="text-align: center"><img src="'+loadingImg+'" style="width:30px">正在加载，请稍等...<div></div></div></div>');
+                '<div style="text-align: center"><img src="'+resourse.loadingImg+'" style="width:30px">正在加载，请稍等...<div></div></div></div>');
             $('#boDataGridLoading-'+_options.namespace).modal({backdrop: 'static', keyboard: false});
             if(_options.title){$(_this).append('<div class="panel-heading">'+_options.title+'</div>');}
             if(_options.toolbar!=undefined&&_options.toolbar.length>0){
@@ -465,22 +468,25 @@
             });
 
             $('#theTopPage-'+_options.namespace+',#topPage-'+_options.namespace+',#lastPage-'+_options.namespace+',#theLastPage-'+_options.namespace+'').on('click',function(){
+                if(defaultDataGridParams[_this[0].id].page==undefined){
+                    defaultDataGridParams[_this[0].id].page='1'
+                }
                 if($(this).attr('id')=='theTopPage-'+_options.namespace){
-                    defaultDataGridParams.page='1';
+                    defaultDataGridParams[_this[0].id].page=1;
                 }else if($(this).attr('id')=='topPage-'+_options.namespace){
-                    if(defaultDataGridParams.page!='1'){
-                        defaultDataGridParams.page=defaultDataGridParams.page-1;
+                    if(defaultDataGridParams[_this[0].id].page!='1'){
+                        defaultDataGridParams[_this[0].id].page=eval(defaultDataGridParams[_this[0].id].page-1);
                     }
                 }else if($(this).attr('id')=='lastPage-'+_options.namespace){
-                    var matchPage= Math.ceil(defaultDataGridParams.total/defaultDataGridParams.rows);
-                    if(defaultDataGridParams.page<matchPage){
-                        defaultDataGridParams.page=eval(defaultDataGridParams.page+1);
+                    var matchPage= Math.ceil(defaultDataGridParams[_this[0].id].total/defaultDataGridParams[_this[0].id].rows);
+                    if(defaultDataGridParams[_this[0].id].page<matchPage){
+                        defaultDataGridParams[_this[0].id].page=eval(defaultDataGridParams[_this[0].id].page+1);
                     }
                 }else if($(this).attr('id')=='theLastPage-'+_options.namespace){
-                    var matchPage= Math.ceil(defaultDataGridParams.total/defaultDataGridParams.rows);
-                    defaultDataGridParams.page=matchPage;
+                    var matchPage= Math.ceil(defaultDataGridParams[_this[0].id].total/defaultDataGridParams[_this[0].id].rows);
+                    defaultDataGridParams[_this[0].id].page=matchPage;
                 }
-                $('#nowPage-'+_options.namespace).html(defaultDataGridParams.page);
+                $('#nowPage-'+_options.namespace).html(defaultDataGridParams[_this[0].id].page);
                 _this.boDataGrid('queryData');
             });
         },
@@ -540,7 +546,6 @@
                     $('#tableData-'+_options.namespace+' tr').click(function(){
                         var _index=$(this).attr('index').slice(6);
                         var _row=tmpBoDataGridData[_this[0].id].rows[_index];
-                        console.info(_row);
                         if(typeof _options.onClickRow == "function"){
                             _options.onClickRow(_index,_row);
                         }
@@ -549,7 +554,6 @@
                     $('#tableData-'+_options.namespace+' tr').dblclick(function(){
                         var _index=$(this).attr('index').slice(6);
                         var _row=tmpBoDataGridData[_this[0].id].rows[_index];
-                        console.info(_row);
                         if(typeof _options.onDblClickRow == "function"){
                             _options.onDblClickRow(_index,_row);
                         }
