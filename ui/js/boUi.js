@@ -1,5 +1,6 @@
 /**author:wangjiaming**/
 (function($){
+    var resourse={loadingImg:'../ui/img/boLoading.gif'};
     /**
      _options={
 
@@ -242,7 +243,7 @@
                 }
                 var loopNum=Math.ceil((options.table[i].content.length)*2/options.table[i].colnum)*options.table[i].colnum/2;
                 var $tr='',jsq=0;
-                for(var j=0;j<=loopNum;j++){
+                for(var j=0;j<loopNum;j++){
                     if($tr==''){
                         $tr=$('<tr></tr>');
                     }
@@ -253,6 +254,7 @@
                             if(options.table[i].content[j].colspan!=undefined){
                                 colspanHtml='colspan="'+options.table[i].content[j].colspan+'"';
                                 jsq=jsq+parseInt(options.table[i].content[j].colspan);
+                                j=j+((parseInt(options.table[i].content[j].colspan)-1)/2);
                             }
                             var $td=$('<td '+colspanHtml+'></td>');
                             if(options.table[i].content[j].formatter==undefined){
@@ -283,7 +285,9 @@
                                     $td.append($ass);
                                 }else if(_assType=='select'){
                                     var $select=$('<select id="'+options.table[i].content[j].id+'"></select>');
-                                    $select.boSelect(options.table[i].content[j].data);
+                                    if(options.table[i].content[j].data){
+                                        $select.boSelect(options.table[i].content[j].data);
+                                    }
                                     $td.append($select);
                                 }
                             }else{
@@ -333,7 +337,7 @@
     /**
      数据表单
      **/
-    var defaultDataGridParams={},tmpBoDataGridData={},resourse={loadingImg:'../ui/img/boLoading.gif'};
+    var defaultDataGridParams={},tmpBoDataGridData={};
     $.fn.boDataGrid=function(options){
         if ($.fn.boDataGrid.methods[options]) {
             return $.fn.boDataGrid.methods[ options ].apply( this, Array.prototype.slice.call( arguments, 1 ));
@@ -576,5 +580,90 @@
         }
 
     }
+
+
+
+$.extend({
+     /**
+     * 联动下拉框
+     * @param option={
+     * id:["xxx","xxx"],
+     * url:["______","______"],
+     * hasnull:false,
+     * valueName:"",默认GNAME
+     * valueKey:"",默认GCODE
+     * fOnloadSuccess:function(){},
+     * sOnloadSuccess:function(){},
+     * fOnSelected:function(){},
+     * sOnSelected:function(){}
+     */
+    boSelectLinkage:function(option){
+        var v_value,v_key,hasnull=false;
+        var ajaxData=new Array();
+        if(option.valueName!=undefined&&option.valueName!=''){
+            v_value=option.valueName;
+        }else{
+            v_value='GCODE';
+        }
+        if(option.valueKey!=undefined&&option.valueKey!='') {
+            v_key = option.valueKey;
+        }else{
+            v_key = 'GNAME';
+        }
+        if(option.hasnull!=undefined||option.selectKeyName!=''){
+            hasnull=option.hasnull;
+        }
+        if(option.id.length!=option.url.length){
+            alert("getBootstrapLinkageSelecte控件ID数组与url数组数量不一致");
+            return;
+        }else{
+            for(var i=0;i<option.id.length;i++){
+                $("#"+option.id[i]).empty();
+                $("#"+option.id[i]).attr("class","form-control");
+                $("#"+option.id[i]).attr("name",option.id[i]);
+                $.ajax({
+                    type: "POST",
+                    url: option.url[i],
+                    dataType: "json",
+                    async:false,
+                    success: function(data){
+                        ajaxData[i]=data;
+                        var oid=0;
+                        if(hasnull){
+                            $("#"+option.id[i]).append('<option rownum="'+oid+'" value="" selected="">---请选择---</option>');
+                            oid++;
+                        }
+                        for(var ii=0;ii<data.rows.length;ii++){
+                            $("#"+option.id[i]).append('<option pid="'+data.rows[ii].PID+'" rownum="'+oid+'" value="'+data.rows[ii][v_value]+'">'+data.rows[ii][v_key]+'</option>');
+                            oid++;
+                        }
+                        if (i==option.id.length-1){
+                            if(typeof option.onLoadSuccess== "function"){
+                                option.onLoadSuccess();
+                            }
+                        }
+                    }
+                });
+            }
+            //绑定联动事件
+            for(var rn=0;rn<option.id.length-1;rn++) {
+                $("#" + option.id[rn]).change(function () {
+                    var selectValue = $(this).val();
+                    $("#" + option.id[rn]).empty();
+                    var oid=0;
+                    $("#"+option.id[rn]).append('<option rownum="'+oid+'" value="" selected="">---请选择---</option>');
+                    oid++;
+                    for(var ii=0;ii<ajaxData[rn].rows.length;ii++){
+                        if(ajaxData[rn].rows[ii].PID==selectValue){
+                            $("#"+option.id[rn]).append('<option pid="'+ajaxData[rn].rows[ii].PID+'" rownum="'+oid+'" value="'+ajaxData[rn].rows[ii][v_value]+'">'+ajaxData[rn].rows[ii][v_key]+'</option>');
+                            oid++;
+                        }
+                    }
+                });
+            }
+        }
+    }
+});
+
 
 })(jQuery);
