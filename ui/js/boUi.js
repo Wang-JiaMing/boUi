@@ -249,7 +249,12 @@
                     if(j<=options.table[i].content.length-1){
                         if(options.table[i].content[j].hidden==undefined||options.table[i].content[j].hidden==false){
                             var $th=$('<th>'+options.table[i].content[j].title+'</th>');
-                            var $td=$('<td></td>');
+                            var colspanHtml='';
+                            if(options.table[i].content[j].colspan!=undefined){
+                                colspanHtml='colspan="'+options.table[i].content[j].colspan+'"';
+                                jsq=jsq+parseInt(options.table[i].content[j].colspan);
+                            }
+                            var $td=$('<td '+colspanHtml+'></td>');
                             if(options.table[i].content[j].formatter==undefined){
                                 var _assType='text';
                                 if(options.table[i].content[j].assType){//控件类型
