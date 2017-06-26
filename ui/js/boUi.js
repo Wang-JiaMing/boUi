@@ -241,20 +241,21 @@
                         $table.append('<input type="hidden" id="'+options.table[i].content[j].id+'" name="'+_name+'"/>');
                     }
                 }
-                var loopNum=Math.ceil((options.table[i].content.length)*2/options.table[i].colnum)*options.table[i].colnum/2;
-                var $tr='',jsq=0;
-                for(var j=0;j<loopNum;j++){
-                    if($tr==''){
+                var $tr='',jsq=0,tdNum=0;
+                for(var j=0;j<options.table[i].content.length;j++){
+                    if(tdNum==0||tdNum==options.table[i].colnum||tdNum>options.table[i].colnum-1){//判断换行时机
+                        tdNum=0;
                         $tr=$('<tr></tr>');
                     }
-                    if(j<=options.table[i].content.length-1){
-                        if(options.table[i].content[j].hidden==undefined||options.table[i].content[j].hidden==false){
+                    if(options.table[i].content[j].hidden==undefined||options.table[i].content[j].hidden==false){
                             var $th=$('<th>'+options.table[i].content[j].title+'</th>');
+                            tdNum=tdNum+1;
                             var colspanHtml='';
                             if(options.table[i].content[j].colspan!=undefined){
                                 colspanHtml='colspan="'+options.table[i].content[j].colspan+'"';
-                                jsq=jsq+parseInt(options.table[i].content[j].colspan);
-                                j=j+((parseInt(options.table[i].content[j].colspan)-1)/2);
+                                tdNum=tdNum+parseInt(options.table[i].content[j].colspan);
+                            }else{
+                                tdNum=tdNum+1;
                             }
                             var $td=$('<td '+colspanHtml+'></td>');
                             if(options.table[i].content[j].formatter==undefined){
@@ -295,21 +296,14 @@
                             }
                             $tr.append($th).append($td);
                             $table.append($tr);
-                            jsq=jsq+2;
-                            if(jsq>=options.table[i].colnum){
-                                jsq=0;
-                                $tr='';
-                            }
-                        }
 
-                    }else{//补TH TD
-                        $tr.append('<th></th><td></td>');
-                        $table.append($tr);
-                        jsq=jsq+2;
-                        if(jsq>=options.table[i].colnum){
-                            jsq=0;
-                            $tr='';
+                    }
+                    if(j==options.table[i].content.length-1&&tdNum<options.table[i].colnum){
+                        var bTdHtml='';
+                        for(var ii=tdNum;ii<options.table[i].colnum;ii++){
+                            bTdHtml+='<td></td>';
                         }
+                        $tr.append(bTdHtml);
                     }
                 }
                 $tableTitel.append($table);
