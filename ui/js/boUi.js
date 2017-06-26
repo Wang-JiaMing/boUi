@@ -576,9 +576,8 @@
     }
 
 
-
 $.extend({
-     /**
+    /**
      * 联动下拉框
      * @param option={
      * id:["xxx","xxx"],
@@ -591,73 +590,149 @@ $.extend({
      * fOnSelected:function(){},
      * sOnSelected:function(){}
      */
-    boSelectLinkage:function(option){
-        var v_value,v_key,hasnull=false;
-        var ajaxData=new Array();
-        if(option.valueName!=undefined&&option.valueName!=''){
-            v_value=option.valueName;
-        }else{
-            v_value='GCODE';
-        }
-        if(option.valueKey!=undefined&&option.valueKey!='') {
-            v_key = option.valueKey;
-        }else{
-            v_key = 'GNAME';
-        }
-        if(option.hasnull!=undefined||option.selectKeyName!=''){
-            hasnull=option.hasnull;
-        }
-        if(option.id.length!=option.url.length){
-            alert("getBootstrapLinkageSelecte控件ID数组与url数组数量不一致");
-            return;
-        }else{
-            for(var i=0;i<option.id.length;i++){
-                $("#"+option.id[i]).empty();
-                $("#"+option.id[i]).attr("class","form-control");
-                $("#"+option.id[i]).attr("name",option.id[i]);
-                $.ajax({
-                    type: "POST",
-                    url: option.url[i],
-                    dataType: "json",
-                    async:false,
-                    success: function(data){
-                        ajaxData[i]=data;
-                        var oid=0;
-                        if(hasnull){
-                            $("#"+option.id[i]).append('<option rownum="'+oid+'" value="" selected="">---请选择---</option>');
-                            oid++;
-                        }
-                        for(var ii=0;ii<data.rows.length;ii++){
-                            $("#"+option.id[i]).append('<option pid="'+data.rows[ii].PID+'" rownum="'+oid+'" value="'+data.rows[ii][v_value]+'">'+data.rows[ii][v_key]+'</option>');
-                            oid++;
-                        }
-                        if (i==option.id.length-1){
-                            if(typeof option.onLoadSuccess== "function"){
-                                option.onLoadSuccess();
-                            }
-                        }
-                    }
-                });
-            }
-            //绑定联动事件
-            for(var rn=0;rn<option.id.length-1;rn++) {
-                $("#" + option.id[rn]).change(function () {
-                    var selectValue = $(this).val();
-                    $("#" + option.id[rn]).empty();
-                    var oid=0;
-                    $("#"+option.id[rn]).append('<option rownum="'+oid+'" value="" selected="">---请选择---</option>');
-                    oid++;
-                    for(var ii=0;ii<ajaxData[rn].rows.length;ii++){
-                        if(ajaxData[rn].rows[ii].PID==selectValue){
-                            $("#"+option.id[rn]).append('<option pid="'+ajaxData[rn].rows[ii].PID+'" rownum="'+oid+'" value="'+ajaxData[rn].rows[ii][v_value]+'">'+ajaxData[rn].rows[ii][v_key]+'</option>');
-                            oid++;
-                        }
-                    }
-                });
-            }
-        }
-    }
-});
+        boSelectLinkage:function(option){
+            var v_value,v_key,hasnull=false,async=true;
+            var ajaxData=new Array();
 
+            if(option.async!=undefined){
+                async=option.async;
+            }
+            if(option.valueName!=undefined&&option.valueName!=''){
+                v_value=option.valueName;
+            }else{
+                v_value='GCODE';
+            }
+            if(option.valueKey!=undefined&&option.valueKey!='') {
+                v_key = option.valueKey;
+            }else{
+                v_key = 'GNAME';
+            }
+            if(option.hasnull!=undefined||option.selectKeyName!=''){
+                hasnull=option.hasnull;
+            }
+            if(option.id.length!=option.url.length){
+                alert("getBootstrapLinkageSelecte控件ID数组与url数组数量不一致");
+                return;
+            }else{
+                if(async){
+                    $.ajax({
+                        type: "POST",
+                        url: option.url[0],
+                        dataType: "json",
+                        success: function (data) {
+                            ajaxData[0] = data;
+                            var oid = 0;
+                            $("#" + option.id[0]).empty();
+                            $("#" + option.id[0]).attr("class", "form-control");
+                            $("#" + option.id[0]).attr("name", option.id[0]);
+                            if (hasnull) {
+                                $("#" + option.id[0]).append('<option rownum="' + oid + '" value="" selected="">---请选择---</option>');
+                                oid++;
+                            }
+                            for (var ii = 0; ii < data.rows.length; ii++) {
+                                $("#" + option.id[0]).append('<option pid="' + data.rows[ii].PID + '" rownum="' + oid + '" value="' + data.rows[ii][v_value] + '">' + data.rows[ii][v_key] + '</option>');
+                                oid++;
+                            };
+
+                        }
+                    });
+                    for(var j=1;j<option.id.length;j++){
+                        $("#" + option.id[j]).empty();
+                        $("#" + option.id[j]).attr("class", "form-control");
+                        $("#" + option.id[j]).attr("name", option.id[j]);
+                        $("#" + option.id[j]).append('<option rownum="0" value="" selected="">---请选择---</option>');
+                    }
+                    //绑定联动事件
+                    for(var rn=0;rn<option.id.length-1;rn++) {
+                        $("#" + option.id[rn]).change(function () {
+                            var selectValue = $(this).val();
+                            if(selectValue!=""){
+                                var _i=0,urlParam="&pid="+selectValue;
+                                for(var i=0;i<option.id.length;i++){
+                                    if(option.id[i]==$(this).attr('id')){
+                                        _i=i+1;
+                                        break;
+                                    }
+                                }
+                                $("#" + option.id[_i]).empty();
+                                $("#" + option.id[_i]).append('<option rownum="" value="" selected="">加载中...</option>');
+                                $.ajax({
+                                    type: "POST",
+                                    url: option.url[_i]+urlParam,
+                                    dataType: "json",
+                                    success: function (data) {
+                                        ajaxData[_i] = data;
+                                        var oid = 0;
+                                        $("#" + option.id[_i]).empty();
+                                        if (hasnull) {
+                                            $("#" + option.id[_i]).append('<option rownum="' + oid + '" value="" selected="">---请选择---</option>');
+                                            oid++;
+                                        }
+                                        for (var ii = 0; ii < data.rows.length; ii++) {
+                                            $("#" + option.id[_i]).append('<option pid="' + data.rows[ii].PID + '" rownum="' + oid + '" value="' + data.rows[ii][v_value] + '">' + data.rows[ii][v_key] + '</option>');
+                                            oid++;
+                                        }
+                                    }
+                                });
+                            }
+                        });
+                    }
+                }else {
+                    for (var i = 0; i < option.id.length; i++) {
+                        $("#" + option.id[i]).empty();
+                        $("#" + option.id[i]).attr("class", "form-control");
+                        $("#" + option.id[i]).attr("name", option.id[i]);
+                        $.ajax({
+                            type: "POST",
+                            url: option.url[i],
+                            dataType: "json",
+                            async: false,
+                            success: function (data) {
+                                ajaxData[i] = data;
+                                var oid = 0;
+                                if (hasnull) {
+                                    $("#" + option.id[i]).append('<option rownum="' + oid + '" value="" selected="">---请选择---</option>');
+                                    oid++;
+                                }
+                                for (var ii = 0; ii < data.rows.length; ii++) {
+                                    $("#" + option.id[i]).append('<option pid="' + data.rows[ii].PID + '" rownum="' + oid + '" value="' + data.rows[ii][v_value] + '">' + data.rows[ii][v_key] + '</option>');
+                                    oid++;
+                                }
+                                if (i == option.id.length - 1) {
+                                    if (typeof option.onLoadSuccess == "function") {
+                                        option.onLoadSuccess();
+                                    }
+                                }
+                            }
+                        });
+                        //绑定联动事件
+                        for(var rn=0;rn<option.id.length-1;rn++) {
+                            $("#" + option.id[rn]).change(function () {
+                                var selectValue = $(this).val();
+                                var _i=0;
+                                for(var i=0;i<option.id.length;i++){
+                                    if(option.id[i]==$(this).attr('id')){
+                                        _i=i+1;
+                                        break;
+                                    }
+                                }
+                                $("#" + option.id[_i]).empty();
+                                var oid=0;
+                                $("#"+ option.id[_i]).append('<option rownum="'+oid+'" value="" selected="">---请选择---</option>');
+                                oid++;
+                                for(var ii=0;ii<ajaxData[_i].rows.length;ii++){
+                                    if(ajaxData[_i].rows[ii].PID==selectValue){
+                                        $("#"+option.id[_i]).append('<option pid="'+ajaxData[_i].rows[ii].PID+'" rownum="'+oid+'" value="'+ajaxData[_i].rows[ii][v_value]+'">'+ajaxData[_i].rows[ii][v_key]+'</option>');
+                                        oid++;
+                                    }
+                                }
+                            });
+                        }
+                    }
+                }
+
+            }
+        }
+    });
 
 })(jQuery);
