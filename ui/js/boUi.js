@@ -72,6 +72,121 @@
         }
     }
 
+    /**
+        下拉多选
+        <div id="demo"><div>
+
+        $('#demo').boCheckBox({
+            url:,
+
+        });
+    */
+    $.fn.boCheckBox=function(options){
+        if ($.fn.boCheckBox.methods[options]) {
+            return $.fn.boCheckBox.methods[ options ].apply( this, Array.prototype.slice.call( arguments, 1 ));
+        }else if ( typeof options === 'object' || ! options ) {
+            return $.fn.boCheckBox.methods.init.apply( this, arguments );
+        } else {
+            $.error( 'Method ' +  method + ' does not exist on jQuery.tooltip' );
+        }
+    };
+
+    $.fn.boCheckBox.methods = {
+        init:function (options) {
+            var _this = this ;
+            $(_this).addClass('dropdown');
+            var $button=$('<button class="btn btn-default dropdown-toggle" type="button" id="_'+_this[0].id+'" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" style="width:150px"><div  id="_checkBoxText-'+_this[0].id+'" style="width:100px;float:left;overflow:hidden">---请选择---</div><span class="caret"></span></button>');
+            var $ul=$('<ul class="dropdown-menu" aria-labelledby="_'+_this[0].id+'"></ul>');
+            var $checkAll=$('<li><input type="checkbox" id="checkAll"/>全选</li><li role="separator" class="divider"></li>'),$checkBoxContent=$('<div id="_checkBox-'+_this[0].id+'"></div>');
+            if (options.data){
+                for(var i=0;i<options.data.length;i++){
+                    $checkBoxContent.append('<li><input type="checkbox" value="'+options.data[i].value+'" text="'+options.data[i].name+'"/>'+options.data[i].name+'</li>');
+                }
+            }else{
+                $.ajax({
+                    type: "POST",
+                    url: options.url,
+                    dataType: "json",
+                    success: function (data){
+                        for(var i=0;i<data.rows.length;i++){
+                            checkHtml+='<li><input type="checkbox" value="'+data.rows[i].value+'" text="'+options.data[i].name+'"/>'+data.rows[i].name+'</li>';
+                        }
+                    }
+                });
+            }
+            $ul.append($checkAll);
+            $ul.append($checkBoxContent);
+            $(_this).append($button);
+            $(_this).append($ul);
+            $('#checkAll').on("change", function(){
+                if($(this)[0].checked){
+                    $(_this).boCheckBox('checkAll');
+                }else{
+                    $(_this).boCheckBox('enCheckAll');
+                }
+                var content="";
+                for(var i=0;i<$(_this).boCheckBox('getCheckTexts').length;i++){
+                    content+=$(_this).boCheckBox('getCheckTexts')[i];
+                    if(i<$(_this).boCheckBox('getCheckTexts').length-1){
+                        content+=",";
+                    }
+                }
+                if(content!=""){
+                    $('#_checkBoxText-'+_this[0].id).html(content);
+                }else{
+                    $('#_checkBoxText-'+_this[0].id).html("---请选择---");
+                }
+            });
+
+            $('#_checkBox-'+_this[0].id).on("change", function(){
+                var content="";
+                for(var i=0;i<$(_this).boCheckBox('getCheckTexts').length;i++){
+                    content+=$(_this).boCheckBox('getCheckTexts')[i];
+                    if(i<$(_this).boCheckBox('getCheckTexts').length-1){
+                        content+=",";
+                    }
+                }
+                if(content!=""){
+                    $('#_checkBoxText-'+_this[0].id).html(content);
+                }else{
+                    $('#_checkBoxText-'+_this[0].id).html("---请选择---");
+                }
+            });
+        },
+        checkAll:function(){
+            var _this=this;
+            $('#_checkBox-'+_this[0].id+' input[type=checkbox]').each(function(){
+               $(this).prop("checked",true);
+            });
+        },
+        enCheckAll:function(){
+            var _this=this;
+            $('#_checkBox-'+_this[0].id+' input[type=checkbox]').each(function(){
+                $(this).prop("checked",false);
+            });
+        },
+        getCheckTexts:function(){
+            var _this=this;
+            var texts=new Array();
+             $('#_checkBox-'+_this[0].id+' input[type=checkbox]').each(function(){
+               if($(this)[0].checked){
+                    texts.push($(this).attr("text"));
+               }
+            });
+            return texts;
+        },
+        getCheckValues:function(){
+            var _this=this;
+            var texts=new Array();
+             $('#_checkBox-'+_this[0].id+' input[type=checkbox]').each(function(){
+               if($(this)[0].checked){
+                    texts.push($(this).val());
+               }
+            });
+            return texts;
+        }
+        
+    }
 
     /**
      * 基于Bootstrap下拉通用插件
@@ -585,10 +700,6 @@ $.extend({
      * hasnull:false,
      * valueName:"",默认GNAME
      * valueKey:"",默认GCODE
-     * fOnloadSuccess:function(){},
-     * sOnloadSuccess:function(){},
-     * fOnSelected:function(){},
-     * sOnSelected:function(){}
      */
         boSelectLinkage:function(option){
             var v_value,v_key,hasnull=false,async=true;
