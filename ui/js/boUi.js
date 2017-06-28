@@ -345,7 +345,7 @@
             var $dialogCloseButton=$('<div class="modal-header" style="padding:5px"><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>')
             var $dialogTitle;
             if(_options.title){
-                $dialogTitle=$('<h5 class="modal-title" id="dialog-'+_options.namespace+'">'+_options.title+'</h5>');
+                $dialogTitle=$('<h4 class="modal-title" id="dialog-'+_options.namespace+'">'+_options.title+'</h4>');
                 $dialogCloseButton.append($dialogTitle);
             }
             var $dialogContent=$('<div class="modal-content"></div>');
@@ -365,6 +365,15 @@
         open:function(){
             var _this = this ;
             var _options=_this.boDialog('getParams',{open:true});
+            $(_this).modal({
+                backdrop:'static',
+                keyboard:false,
+                show:_options.open
+            });
+        },
+        close:function(){
+            var _this = this ;
+            var _options=_this.boDialog('getParams',{open:false});
             $(_this).modal({
                 backdrop:'static',
                 keyboard:false,
