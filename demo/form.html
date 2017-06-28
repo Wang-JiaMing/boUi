@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <title>Bootstrap 101 Template</title>
+    <script src="../js/jquery/jquery-3.2.1.min.js"></script>
+    <link href="../js/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <script src="../js/bootstrap/js/bootstrap.min.js"></script>
+    <script src="../ui/js/boUi.js"></script>
+  </head>
+  <body>
+    <div id="t"></div>
+  
+
+</div>
+
+  </body>
+  <script type="text/javascript">
+  $(function(){
+  	$('#t').boTable({
+            formId:'addMdFileForm',
+            method:'post',//post或get
+            toolbar:[
+                {text:'保存',btnScene:'primary',handler:function(){
+                        alert('保存');
+                }},
+                {text:'更新',handler:function(){
+                        alert('更新');
+                 }},
+                {text:'重置表单',handler:function(){
+                        alert('重置表单');
+                 }},
+                {text:'调取健康档案',handler:function(){
+                        alert('调取健康档案');
+                 }},
+                {text:'关联者信息',handler:function(){
+                        alert('关联者信息');
+                 }}],
+            table:[
+                {
+                    title:"患者基本信息",
+                    colnum:'8',//每行多少列
+                    scene:'primary',
+                    content:[
+                        {title:"姓名",id:"userName",required:true},//默认type="text"
+                        {title:"曾用名",id:"usedName",colspan:"5"},
+                        {title:"患儿家长姓名",id:"PARENT_NAME"},
+                        {title:"性别",id:"SEX"},
+                        {title:"证件类型",id:"CERT_TYPE"},
+                        {title:"证件号码",id:"CERT_NO"},
+                        {title:"出生日期",id:"BIRTHDAY"},
+                        {title:"年龄",id:"AGE"},
+                        {title:"年龄",id:"AGE",colspan:"5"},
+                        {title:"年龄",id:"AGE",formatter:function(){
+                            return '<select id="11111"></select>'
+                        }},
+                    ]
+                },
+                {
+                    title:"测试2",
+                    colnum:'8',//每行多少列
+                    scene:'primary',//primary,success,info,warning,danger
+                    content:[
+                        {title:"id",id:"id",name:"id",hidden:true,disabled:true,readonly:true},//name可以不填，默认取ID为name
+                        {title:"姓名11111111111111111",id:"name1",placeholder:"姓名",required:true},//默认type="text"
+                        {title:"姓名2",id:"name2",placeholder:"姓名"},
+                        {title:"姓名3",id:"name3",placeholder:"姓名"},
+                        {title:"姓名4",id:"name4",placeholder:"姓名"},
+                        {title:"姓名5",id:"name6",placeholder:"姓名"},
+                        {title:"姓名6",id:"name6",placeholder:"姓名"},
+                        {title:"姓名7",id:"name7",placeholder:"姓名"},
+                        {title:"姓名8",id:"name8",placeholder:"姓名"},
+                        {title:"姓名9",id:"name9",placeholder:"姓名"}
+                    ]
+                }
+            ],
+            onLoadSuccess:function(){
+              
+            }
+        });
+  });
+  </script>
+</html>
