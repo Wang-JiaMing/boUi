@@ -329,7 +329,7 @@
     $.fn.boDialog.methods = {
         getParams:function(options){
             if(defaultDialogOptions[this[0].id]==undefined){
-                defaultDialogOptions[this[0].id] = $.extend({},{title:"提示信息",size:"sm",open:false,namespace:this[0].id},options);
+                defaultDialogOptions[this[0].id] = $.extend({},{height:450,init:false,title:"提示信息",size:"sm",open:false,namespace:this[0].id},options);
             }else{
                 defaultDialogOptions[this[0].id] = $.extend({},defaultDialogOptions[this[0].id], options);
             }
@@ -342,15 +342,17 @@
             $(_this).empty();
             $(_this).addClass("modal fade bs-example-modal-"+_options.size).attr('tabindex','-1').attr('role','dialog').attr('aria-labelledby','dialog-'+_options.namespace);
             var $dialogDocument=$('<div class="modal-dialog modal-'+_options.size+'" role="document"></div>');
-            var $dialogCloseButton=$('<div class="modal-header" style="padding:5px"><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>')
+            var $dialogHeader=$('<div class="modal-header" style="padding:5px"><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>')
             var $dialogTitle;
             if(_options.title){
-                $dialogTitle=$('<h4 class="modal-title" id="dialog-'+_options.namespace+'">'+_options.title+'</h4>');
-                $dialogCloseButton.append($dialogTitle);
+                $dialogTitle=$('<h4 class="modal-title" id="dialog-'+_options.namespace+'">'+_options.title+'</h4 >');
+                $dialogHeader.append($dialogTitle);
             }
-            var $dialogContent=$('<div class="modal-content"></div>');
-            $dialogContent.append($dialogCloseButton);
-            $dialogContent.append(_content);
+            var $dialogContent=$('<div class="modal-content" style="height:'+_options.height+'px"></div>');
+            var $dialogBody=$('<div class="modal-body" style="height:'+(_options.height-50)+'px;overflow:auto"></div>');
+            $dialogContent.append($dialogHeader);
+            $dialogBody.append(_content);
+            $dialogContent.append($dialogBody);
             $dialogDocument.append($dialogContent);
             $(_this).append($dialogDocument);
             $('#dialog-'+_options.namespace).modal({
@@ -361,6 +363,7 @@
             if (typeof _options.onLoadSuccess == "function") {
                     _options.onLoadSuccess();
             }
+            $(_this).boDialog('getParams',{init:true});
         },
         open:function(){
             var _this = this ;
@@ -526,6 +529,11 @@
     $.fn.boTable.methods={
         init:function(options){
             var _this=this;
+            $(_this).append('<div id="boTableLoading-'+this[0].id+'" class="modal fade bs-example-modal-sm" tabindex="-1"'+
+                'role="dialog" aria-labelledby="mySmallModalLabel">'+
+                '<div class="modal-dialog modal-sm" role="document"><div class="modal-content">'+
+                '<div style="text-align: center"><img src="'+resourse.loadingImg+'" style="width:30px">正在处理中，请稍等...<div></div></div></div>');
+            $('#boTableLoading-'+this[0].id).modal({backdrop: 'static', keyboard: false});
             var $topFormDiv=$('<div style="width:100%;height:100%;overflow:auto"></div>');
             var $buttonDiv=$('<div style="overflow:auto"><div class="btn-group" role="group" aria-label="anz"></div></div>');
             var $form=$('<form id='+options.formId+' method='+options.method+'></form>');
@@ -639,6 +647,12 @@
             if(typeof options.onLoadSuccess== "function"){
                 options.onLoadSuccess();
             }
+        },
+        loading:function(){
+            $('#boTableLoading-'+this[0].id).modal('show');
+        },
+        loaded:function(){
+            $('#boTableLoading-'+this[0].id).modal('hide');
         }
     }
 
