@@ -516,6 +516,81 @@
     /**
      form表单
      **/
+    $.fn.boForm=function(options){
+        if ($.fn.boForm.methods[options]) {
+            return $.fn.boForm.methods[ options ].apply( this, Array.prototype.slice.call( arguments, 1 ));
+        }else if ( typeof options === 'object' || ! options ) {
+            return $.fn.boForm.methods.init.apply( this, arguments );
+        } else {
+            $.error( 'Method ' +  method + ' does not exist on jQuery.tooltip' );
+        }
+    }
+    $.fn.boForm.methods={
+        init:function(){},
+        reset:function(options){
+            var _this=this;
+            var selector=this.selector;
+            $(selector+" input[type=hidden]").each(function(){
+                $(selector+" input[id="+$(this).attr('id')+"]").val('');
+            });
+            $(selector+" input[type=text]").each(function(){
+                $(selector+" input[id="+$(this).attr('id')+"]").val('');
+            });
+            $(selector+" input[type=radio]").each(function(){
+                $(selector+" input[id="+$(this).attr('id')+"]").removeAttr("checked");
+            });
+            $(this.selector+" select").each(function(){
+                $(selector+" select[id="+$(this).attr('id')+"] option:first").prop("selected", 'selected');
+            });
+        },
+        setData:function(options){
+            var _this = this;
+            var setType="id";
+            if(option.isId!=undefined||option.isId!=''){
+                if(options.isId){
+                    setType="id";
+                }else{
+                    setType="name";
+                }
+            }
+            $(_this.selector+" input[type=text]").each(function(){
+                if( $(_this).attr(setType)!=undefined&&option.json[$(_this).attr(setType).toUpperCase()]!=null) {
+                    $(_this).val(option.json[$(_this).attr(setType).toUpperCase()]);
+                }
+            });
+
+            $(_this.selector+" input[type=hidden]").each(function(){
+                if( $(_this).attr(setType)!=undefined&&option.json[$(_this).attr(setType).toUpperCase()]!=null) {
+                    $(_this).val(option.json[$(_this).attr(setType).toUpperCase()]);
+                }
+            });
+            $(_this.selector+" select").each(function(){
+                if( $(_this).attr(setType)!=undefined&&option.json[$(_this).attr(setType).toUpperCase()]!=null) {
+                    $('#'+$(_this).attr('id')).getBootstrapSelecte("setValue", option.json[$(_this).attr(setType).toUpperCase()]);
+                }else{
+                    $('#'+$(_this).attr('id')+" option:first").prop("selected", 'selected');
+                }
+            });
+            $(_this.selector+" input[type=radio]").each(function(){
+                if(option.json[$(_this).attr('name').toUpperCase()]==$(_this).val()){
+                    $('#'+$(_this).attr('id')).prop("checked",'checked');
+                }
+            });
+            $(_this.selector+" textarea").each(function(){
+                if( $(_this).attr(setType)!=undefined&&option.json[$(_this).attr(setType).toUpperCase()]!=null) {
+                    $('#'+$(_this).attr('id')).val(option.json[$(_this).attr(setType).toUpperCase()]);
+                }
+            });
+            if(typeof onLoadSuccess== "function"){
+                onLoadSuccess();
+            }
+        }
+    }
+
+
+    /**
+     form表单
+     **/
     $.fn.boTable=function(options){
         if ($.fn.boTable.methods[options]) {
             return $.fn.boTable.methods[ options ].apply( this, Array.prototype.slice.call( arguments, 1 ));
