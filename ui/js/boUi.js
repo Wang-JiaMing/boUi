@@ -529,11 +529,12 @@
     $.fn.boTable.methods={
         init:function(options){
             var _this=this;
-            $(_this).append('<div id="boTableLoading-'+this[0].id+'" class="modal fade bs-example-modal-sm" tabindex="-1"'+
+            $(_this).append('<div id="boTableLoading-'+_this[0].id+'" class="modal fade bs-example-modal-sm" tabindex="-1"'+
                 'role="dialog" aria-labelledby="mySmallModalLabel">'+
                 '<div class="modal-dialog modal-sm" role="document"><div class="modal-content">'+
                 '<div style="text-align: center"><img src="'+resourse.loadingImg+'" style="width:30px">正在处理中，请稍等...<div></div></div></div>');
-            $('#boTableLoading-'+this[0].id).modal({backdrop: 'static', keyboard: false});
+            $('#boTableLoading-'+_this[0].id).modal({backdrop: 'static', keyboard: false});
+            $('#boTableLoading-'+_this[0].id).modal('hide');
             var $topFormDiv=$('<div style="width:100%;height:100%;overflow:auto"></div>');
             var $buttonDiv=$('<div style="overflow:auto"><div class="btn-group" role="group" aria-label="anz"></div></div>');
             var $form=$('<form id='+options.formId+' method='+options.method+'></form>');
@@ -564,7 +565,18 @@
                         $tr=$('<tr></tr>');
                     }
                     if(options.table[i].content[j].hidden==undefined||options.table[i].content[j].hidden==false){
-                        var $th=$('<th>'+options.table[i].content[j].title+'</th>');
+                        var _title='';
+                        if(options.table[i].content[j].required){
+                            _title='<span style="color:red">'+options.table[i].content[j].title+'&nbsp;&nbsp;*</span>'
+                        }else{
+                            _title=options.table[i].content[j].title;
+                        }
+                        var _required="";
+                        if(options.table[i].content[j].required){
+                            _required='required="true"'
+                        }   
+
+                        var $th=$('<th>'+_title+'</th>');
                         tdNum=tdNum+1;
                         var colspanHtml='';
                         if(options.table[i].content[j].colspan!=undefined){
@@ -586,7 +598,8 @@
                                     if(_radioThis.checked){
                                         _checkedHtml='checked="checked"';
                                     }
-                                    radioHtml+=_radioThis.title+'<input type="radio" '+_checkedHtml+' name="'+options.table[i].content[j].name+'" id="'+options.table[i].content[j].id+'" value="'+options.table[i].content[j].value+'">';
+
+                                    radioHtml+=_radioThis.title+'<input '+_required+' type="radio" '+_checkedHtml+' name="'+options.table[i].content[j].name+'" id="'+options.table[i].content[j].id+'" value="'+options.table[i].content[j].value+'">';
                                 });
                                 $td.append(radioHtml);
                             }else if(_assType=='text'){
@@ -598,16 +611,16 @@
                                 if(options.table[i].content[j].placeholder){
                                     _placeholderHtml='placeholder="'+options.table[i].content[j].placeholder+'"';
                                 }
-                                var $ass=$('<input type="text" id="'+options.table[i].content[j].id+'" name="'+_name+'" '+_placeholderHtml+' class="form-control">');
+                                var $ass=$('<input '+_required+' type="text" id="'+options.table[i].content[j].id+'" name="'+_name+'" '+_placeholderHtml+' class="form-control">');
                                 $td.append($ass);
                             }else if(_assType=='select'){
-                                var $select=$('<select id="'+options.table[i].content[j].id+'"></select>');
+                                var $select=$('<select '+_required+' id="'+options.table[i].content[j].id+'"></select>');
                                 if(options.table[i].content[j].data){
                                     $select.boSelect(options.table[i].content[j].data);
                                 }
                                 $td.append($select);
                             }else if(_assType=='checkBox'){
-                                var $checkbox=$('<div id="'+options.table[i].content[j].id+'"></div>');
+                                var $checkbox=$('<div '+_required+' id="'+options.table[i].content[j].id+'"></div>');
                                 if(options.table[i].content[j].data){
                                     $checkbox.boCheckBox(options.table[i].content[j].data);
                                 }
@@ -687,6 +700,7 @@
                 '<div class="modal-dialog modal-sm" role="document"><div class="modal-content">'+
                 '<div style="text-align: center"><img src="'+resourse.loadingImg+'" style="width:30px">正在加载，请稍等...<div></div></div></div>');
             $('#boDataGridLoading-'+_options.namespace).modal({backdrop: 'static', keyboard: false});
+
             if(_options.title){$(_this).append('<div class="panel-heading">'+_options.title+'</div>');}
             if(_options.toolbar!=undefined&&_options.toolbar.length>0){
                 var $toolbar=$('<div class="panel-body" style="padding:3px"></div>');

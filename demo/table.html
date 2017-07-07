@@ -46,6 +46,7 @@
                     colnum:'8',//每行多少列
                     scene:'primary',
                     content:[
+                        {title:"id",id:"id",hidden:true},
                         {title:"姓名",id:"userName",required:true},//默认type="text"
                         {title:"曾用名",id:"usedName",colspan:"5"},
                         {title:"患儿家长姓名",id:"PARENT_NAME"},
@@ -83,7 +84,7 @@
             }
         });
 
-    $('#t').boTable('loading')
+    // $('#t').boTable('loading')
   });
   </script>
 </html>
