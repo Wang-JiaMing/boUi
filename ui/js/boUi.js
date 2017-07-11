@@ -105,7 +105,7 @@
             var _this = this ;
             var _options=_this.boCheckBox('getParams',options);
             if(_options.dropup){
-                 $(_this).addClass('dropup');
+                $(_this).addClass('dropup');
             }else{
                 $(_this).addClass('dropdown');
             }
@@ -313,8 +313,8 @@
     };
 
     /**
-    弹窗 dialog
-    */
+     弹窗 dialog
+     */
     var defaultDialogOptions={}
     $.fn.boDialog=function(options){
         if ($.fn.boDialog.methods[options]) {
@@ -361,7 +361,7 @@
                 show:_options.open
             });
             if (typeof _options.onLoadSuccess == "function") {
-                    _options.onLoadSuccess();
+                _options.onLoadSuccess();
             }
             $(_this).boDialog('getParams',{init:true});
         },
@@ -440,7 +440,11 @@
                     if (option.name != undefined && option.name != '') {
                         $(v_selector).attr("name", option.name);
                     } else {
-                        $(v_selector).attr("name", v_selector.selector.substr(1));
+                        if( v_selector.selector.substr(1)&&v_selector.selector.substr(1)!=''){
+                            $(v_selector).attr("name", v_selector.selector.substr(1));
+                        }else{
+                            $(v_selector).attr("name", v_selector[0].id);
+                        }
                     }
                     $.ajax({
                         type: "POST",
@@ -545,40 +549,41 @@
         },
         setData:function(options){
             var _this = this;
+            var selector=this.selector;
             var setType="id";
-            if(option.isId!=undefined||option.isId!=''){
+            if(options.isId!=undefined||options.isId!=''){
                 if(options.isId){
                     setType="id";
                 }else{
                     setType="name";
                 }
             }
-            $(_this.selector+" input[type=text]").each(function(){
-                if( $(_this).attr(setType)!=undefined&&option.json[$(_this).attr(setType).toUpperCase()]!=null) {
-                    $(_this).val(option.json[$(_this).attr(setType).toUpperCase()]);
+            $(selector+" input[type=text]").each(function(){
+                if( $(this).attr(setType)!=undefined&&options.json[$(this).attr(setType).toUpperCase()]!=null) {
+                    $(this).val(options.json[$(this).attr(setType).toUpperCase()]);
                 }
             });
 
-            $(_this.selector+" input[type=hidden]").each(function(){
-                if( $(_this).attr(setType)!=undefined&&option.json[$(_this).attr(setType).toUpperCase()]!=null) {
-                    $(_this).val(option.json[$(_this).attr(setType).toUpperCase()]);
+            $(selector+" input[type=hidden]").each(function(){
+                if( $(this).attr(setType)!=undefined&&options.json[$(this).attr(setType).toUpperCase()]!=null) {
+                    $(this).val(options.json[$(this).attr(setType).toUpperCase()]);
                 }
             });
-            $(_this.selector+" select").each(function(){
-                if( $(_this).attr(setType)!=undefined&&option.json[$(_this).attr(setType).toUpperCase()]!=null) {
-                    $('#'+$(_this).attr('id')).getBootstrapSelecte("setValue", option.json[$(_this).attr(setType).toUpperCase()]);
+            $(selector+" select").each(function(){
+                if( $(this).attr(setType)!=undefined&&options.json[$(this).attr(setType).toUpperCase()]!=null) {
+                    $('#'+$(this).attr('id')).getBootstrapSelecte("setValue", options.json[$(this).attr(setType).toUpperCase()]);
                 }else{
-                    $('#'+$(_this).attr('id')+" option:first").prop("selected", 'selected');
+                    $('#'+$(this).attr('id')+" options:first").prop("selected", 'selected');
                 }
             });
-            $(_this.selector+" input[type=radio]").each(function(){
-                if(option.json[$(_this).attr('name').toUpperCase()]==$(_this).val()){
-                    $('#'+$(_this).attr('id')).prop("checked",'checked');
+            $(selector+" input[type=radio]").each(function(){
+                if(options.json[$(this).attr('name').toUpperCase()]==$(this).val()){
+                    $('#'+$(this).attr('id')).prop("checked",'checked');
                 }
             });
-            $(_this.selector+" textarea").each(function(){
-                if( $(_this).attr(setType)!=undefined&&option.json[$(_this).attr(setType).toUpperCase()]!=null) {
-                    $('#'+$(_this).attr('id')).val(option.json[$(_this).attr(setType).toUpperCase()]);
+            $(selector+" textarea").each(function(){
+                if( $(this).attr(setType)!=undefined&&options.json[$(this).attr(setType).toUpperCase()]!=null) {
+                    $('#'+$(this).attr('id')).val(options.json[$(this).attr(setType).toUpperCase()]);
                 }
             });
             if(typeof onLoadSuccess== "function"){
@@ -649,7 +654,7 @@
                         var _required="";
                         if(options.table[i].content[j].required){
                             _required='required="true"'
-                        }   
+                        }
 
                         var $th=$('<th>'+_title+'</th>');
                         tdNum=tdNum+1;
@@ -691,11 +696,14 @@
                             }else if(_assType=='select'){
                                 var $select=$('<select '+_required+' id="'+options.table[i].content[j].id+'"></select>');
                                 if(options.table[i].content[j].data){
+                                    if(options.table[i].content[j].name){
+                                        options.table[i].content[j].data={name:options.table[i].content[j].name}
+                                    }
                                     $select.boSelect(options.table[i].content[j].data);
                                 }
                                 $td.append($select);
                             }else if(_assType=='checkBox'){
-                                var $checkbox=$('<div '+_required+' id="'+options.table[i].content[j].id+'"></div>');
+                                var $checkbox=$('<div '+_required+' id="'+options.table[i].content[j].id+'" name="'+_name+'"></div>');
                                 if(options.table[i].content[j].data){
                                     $checkbox.boCheckBox(options.table[i].content[j].data);
                                 }
@@ -723,7 +731,7 @@
             _this.append($topFormDiv);
             $(options.toolbar).each(function (i, o) {
                 var _btnThis=this;
-                var $btn=$('<button type="button" class="btn btn-'+_btnThis.btnScene+'">'+_btnThis.text+'</button>');
+                var $btn=$('<button type="button" id="'+_btnThis.id+'" class="btn btn-'+_btnThis.btnScene+'">'+_btnThis.text+'</button>');
                 if(_btnThis.handler&&typeof _btnThis.handler == "function"){
                     $btn.click(function(){
                         _btnThis.handler();
