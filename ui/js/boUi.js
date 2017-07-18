@@ -511,8 +511,8 @@
         },
         setValue: function (value) {
             var v_id=$(this).attr("id");
-            $("#"+$(v_id).selector + ' option[selected]').removeAttr("selected");
-            $("#"+$(v_id).selector + ' option[value="'+ value +'"]') .prop("selected", 'selected');
+            $("#"+v_id + ' option[selected]').removeAttr("selected");
+            $("#"+v_id + ' option[value="'+ value +'"]') .prop("selected", 'selected');
         }
     }
 
@@ -571,9 +571,9 @@
             });
             $(selector+" select").each(function(){
                 if( $(this).attr(setType)!=undefined&&options.json[$(this).attr(setType).toUpperCase()]!=null) {
-                    $('#'+$(this).attr('id')).getBootstrapSelecte("setValue", options.json[$(this).attr(setType).toUpperCase()]);
+                    $(this).boSelect("setValue", options.json[$(this).attr(setType).toUpperCase()]);
                 }else{
-                    $('#'+$(this).attr('id')+" options:first").prop("selected", 'selected');
+                    $('#'+this.id+' option:first').prop("selected", 'selected');
                 }
             });
             $(selector+" input[type=radio]").each(function(){
@@ -609,6 +609,7 @@
     $.fn.boTable.methods={
         init:function(options){
             var _this=this;
+            if($(_this).html().length>0) return;
             $(_this).append('<div id="boTableLoading-'+_this[0].id+'" class="modal fade bs-example-modal-sm" tabindex="-1"'+
                 'role="dialog" aria-labelledby="mySmallModalLabel">'+
                 '<div class="modal-dialog modal-sm" role="document"><div class="modal-content">'+
@@ -697,7 +698,7 @@
                                 var $select=$('<select '+_required+' id="'+options.table[i].content[j].id+'"></select>');
                                 if(options.table[i].content[j].data){
                                     if(options.table[i].content[j].name){
-                                        options.table[i].content[j].data={name:options.table[i].content[j].name}
+                                        options.table[i].content[j].data.name=options.table[i].content[j].name;
                                     }
                                     $select.boSelect(options.table[i].content[j].data);
                                 }
@@ -1006,6 +1007,7 @@
          * 联动下拉框
          * @param option={
      * id:["xxx","xxx"],
+     * name:["xxx","xxx"],
      * url:["______","______"],
      * hasnull:false,
      * valueName:"",默认GNAME
@@ -1045,7 +1047,11 @@
                             var oid = 0;
                             $("#" + option.id[0]).empty();
                             $("#" + option.id[0]).attr("class", "form-control");
-                            $("#" + option.id[0]).attr("name", option.id[0]);
+                            if(option.name){
+                                $("#" + option.id[0]).attr("name", option.name[0]);
+                            }else{
+                                $("#" + option.id[0]).attr("name", option.id[0]);
+                            }
                             if (hasnull) {
                                 $("#" + option.id[0]).append('<option rownum="' + oid + '" value="" selected="">---请选择---</option>');
                                 oid++;
@@ -1060,7 +1066,11 @@
                     for(var j=1;j<option.id.length;j++){
                         $("#" + option.id[j]).empty();
                         $("#" + option.id[j]).attr("class", "form-control");
-                        $("#" + option.id[j]).attr("name", option.id[j]);
+                        if( option.name){
+                            $("#" + option.id[0]).attr("name", option.name[0]);
+                        }else{
+                            $("#" + option.id[0]).attr("name", option.id[0]);
+                        }
                         $("#" + option.id[j]).append('<option rownum="0" value="" selected="">---请选择---</option>');
                     }
                     //绑定联动事件
@@ -1102,7 +1112,11 @@
                     for (var i = 0; i < option.id.length; i++) {
                         $("#" + option.id[i]).empty();
                         $("#" + option.id[i]).attr("class", "form-control");
-                        $("#" + option.id[i]).attr("name", option.id[i]);
+                        if( option.name){
+                            $("#" + option.id[i]).attr("name", option.name[i]);
+                        }else{
+                            $("#" + option.id[i]).attr("name", option.id[i]);
+                        }
                         $.ajax({
                             type: "POST",
                             url: option.url[i],
